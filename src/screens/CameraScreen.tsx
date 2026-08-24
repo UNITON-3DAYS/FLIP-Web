@@ -120,7 +120,8 @@ export default function CameraScreen() {
   }
 
   return (
-    <main className="relative mx-auto flex min-h-dvh w-full max-w-md flex-col bg-zinc-900">
+    // h-dvh 고정: min-h면 video의 h-full(퍼센트 높이)이 무시된다
+    <main className="relative mx-auto flex h-dvh w-full max-w-md flex-col bg-zinc-900">
       <div className="relative flex-1 overflow-hidden">
         <video ref={videoRef} autoPlay playsInline muted className="size-full object-cover" />
         {/* 촬영 가이드 프레임 */}
