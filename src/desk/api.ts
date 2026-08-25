@@ -120,19 +120,21 @@ export async function getDeskGradings(): Promise<DeskGradingView[]> {
       request<AdminGradingDetail>(`/admin/grading-records/${item.gradingRecordId}`),
     ),
   )
-  return gradingRecords.map((item, index) => ({
-    id: String(item.gradingRecordId),
-    studentName: item.studentName,
-    studentGrade: `${item.grade}학년`,
-    date: toIsoDate(item.createdAt),
-    examType: EXAM_TYPE_BY_SOURCE[item.worksheetSource] ?? '시험지',
-    title: item.worksheetTitle,
-    score: details[index].score,
-    correctCount: details[index].correctCount,
-    totalCount: details[index].totalCount,
-    wrongAnswers: details[index].wrongAnswers.map((wrong) => ({
-      page: wrong.page,
-      number: wrong.questionNumber,
-    })),
-  }))
+  return gradingRecords
+    .map((item, index) => ({
+      id: String(item.gradingRecordId),
+      studentName: item.studentName,
+      studentGrade: `${item.grade}학년`,
+      date: toIsoDate(item.createdAt),
+      examType: EXAM_TYPE_BY_SOURCE[item.worksheetSource] ?? '시험지',
+      title: item.worksheetTitle,
+      score: details[index].score,
+      correctCount: details[index].correctCount,
+      totalCount: details[index].totalCount,
+      wrongAnswers: details[index].wrongAnswers.map((wrong) => ({
+        page: wrong.page,
+        number: wrong.questionNumber,
+      })),
+    }))
+    .sort((a, b) => b.date.localeCompare(a.date) || Number(b.id) - Number(a.id)) // 최신순 보장
 }
