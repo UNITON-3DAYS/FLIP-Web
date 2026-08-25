@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
 
+import ViewChip from '@/components/ViewChip'
 import { GRADINGS, studentById } from '@/desk/mock'
 
 function GradingLogPage() {
@@ -52,9 +52,7 @@ function GradingLogPage() {
                   <td className="px-6 py-4 text-gray-700">{row.examType}</td>
                   <td className="px-6 py-4 text-gray-700">{row.title}</td>
                   <td className="px-6 py-4 text-right">
-                    <Link to={`/grading/${row.id}`} className="font-bold text-primary-400">
-                      보기 ›
-                    </Link>
+                    <ViewChip to={`/grading/${row.id}`} />
                   </td>
                 </tr>
               ))
