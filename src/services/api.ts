@@ -11,6 +11,7 @@ import type {
 // Notion API 명세서 기준 (Base URL 예: https://34.50.17.22.nip.io/api)
 // VITE_API_BASE_URL이 없으면 목(localStorage)으로 동작한다.
 const BASE = import.meta.env.VITE_API_BASE_URL as string | undefined
+export const HAS_SERVER = Boolean(BASE)
 // ponytail: 학생 로그인 API 전 임시 — 가입 화면에서 입력한 학생 ID 사용, 없으면 env → '1'
 const studentIdHeader = () =>
   loadUser()?.studentId ?? (import.meta.env.VITE_STUDENT_ID as string | undefined) ?? '1'
@@ -59,7 +60,7 @@ const mockSessions = new Map<string, { setup: GradingSetup; pages: Set<number> }
 // 세션별 마지막(최대 seq) 업로드의 gradingImageId — 명세상 세션 종료 PATCH body에 필요
 const lastImageBySession = new Map<string, { seq: number; gradingImageId: number }>()
 
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
+export async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {
     ...init,
     headers: { studentId: studentIdHeader(), ...init?.headers },
@@ -187,7 +188,7 @@ export async function getGradings(date: string): Promise<GradingSummary[]> {
 
 // createdAt이 ISO("2026-08-24…")든 명세 예시의 한국어("2026년 8월 24일")든 YYYY-MM-DD로 정규화.
 // 서버 일시는 타임존 표기가 없는 UTC라서 'Z'를 붙여 UTC로 파싱한 뒤 로컬(KST) 날짜로 변환한다.
-function toIsoDate(value: string): string {
+export function toIsoDate(value: string): string {
   const korean = value.match(/(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일/)
   if (korean) {
     const [, year, month, day] = korean

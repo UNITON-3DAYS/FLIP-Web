@@ -2,12 +2,14 @@ import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 
 import ScoreDonut from '@/components/ScoreDonut'
-import { GRADINGS, loadComment, saveComment, studentById } from '@/desk/mock'
+import { getDeskGradings } from '@/desk/api'
+import { loadComment, saveComment } from '@/desk/mock'
+import { useAsync } from '@/hooks/useAsync'
 
 function GradingResultPage() {
   const { recordId } = useParams()
-  const grading = GRADINGS.find((item) => item.id === recordId)
-  const student = studentById(grading?.studentId)
+  const { data: gradings, loading, error } = useAsync(getDeskGradings, [])
+  const grading = gradings?.find((item) => item.id === recordId)
   const [comment, setComment] = useState(() => loadComment(recordId ?? ''))
   const [saved, setSaved] = useState(false)
 
@@ -18,10 +20,14 @@ function GradingResultPage() {
     window.setTimeout(() => setSaved(false), 2000)
   }
 
-  if (!grading) {
+  if (loading) {
+    return <section className="text-sm text-gray-600">불러오는 중...</section>
+  }
+
+  if (error || !grading) {
     return (
       <section className="text-sm text-gray-600">
-        채점 결과를 찾을 수 없어요.{' '}
+        {error ?? '채점 결과를 찾을 수 없어요.'}{' '}
         <Link to="/grading" className="font-bold text-primary-400">
           목록으로
         </Link>
@@ -52,8 +58,9 @@ function GradingResultPage() {
           <p className="text-sm text-gray-600">{grading.date.replaceAll('-', '.')}</p>
           <h1 className="mt-1 text-xl font-bold text-gray-900">{grading.title}</h1>
           <p className="mt-1 text-sm text-gray-600">
-            {student?.name} · {student?.grade} · {grading.examType}
-            {grading.bookName ? ` · ${grading.bookName}` : ''} · {grading.range}
+            {grading.studentName} · {grading.studentGrade} · {grading.examType}
+            {grading.bookName ? ` · ${grading.bookName}` : ''}
+            {grading.range ? ` · ${grading.range}` : ''}
           </p>
           <div className="mt-6">
             <ScoreDonut

@@ -3,36 +3,44 @@ import type { FormEvent } from 'react'
 
 import Dropdown from '@/components/Dropdown'
 import ViewChip from '@/components/ViewChip'
-import type { DeskStudent } from '@/desk/mock'
-import { SCHOOLS, STUDENTS } from '@/desk/mock'
+import type { DeskStudentView } from '@/desk/api'
+import { getDeskStudents } from '@/desk/api'
+import { SCHOOLS } from '@/desk/mock'
+import { useAsync } from '@/hooks/useAsync'
 
 const GRADES = ['1학년', '2학년', '3학년'] as const
 
 function StudentRosterPage() {
-  const [students, setStudents] = useState(STUDENTS)
+  const { data: serverStudents, loading, error } = useAsync(getDeskStudents, [])
+  // 학생 추가·삭제 API는 서버에 없어 화면 상태로만 반영한다 (데모용)
+  const [extra, setExtra] = useState<DeskStudentView[]>([])
+  const [removedIds, setRemovedIds] = useState<Set<string>>(new Set())
+  const students = [...(serverStudents ?? []), ...extra].filter(
+    (student) => !removedIds.has(student.id),
+  )
   const dialogRef = useRef<HTMLDialogElement>(null)
   const deleteDialogRef = useRef<HTMLDialogElement>(null)
   const [name, setName] = useState('')
   const [school, setSchool] = useState('')
   const [grade, setGrade] = useState<string>(GRADES[0])
-  const [deleteTarget, setDeleteTarget] = useState<DeskStudent | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<DeskStudentView | null>(null)
 
   const addStudent = (e: FormEvent) => {
     e.preventDefault()
     if (!name.trim() || !school) return
-    setStudents([...students, { id: `s-${Date.now()}`, name: name.trim(), school, grade }])
+    setExtra([...extra, { id: `s-${Date.now()}`, name: name.trim(), school, grade }])
     setName('')
     setSchool('')
     dialogRef.current?.close()
   }
 
-  const askRemove = (student: DeskStudent) => {
+  const askRemove = (student: DeskStudentView) => {
     setDeleteTarget(student)
     deleteDialogRef.current?.showModal()
   }
 
   const confirmRemove = () => {
-    if (deleteTarget) setStudents(students.filter((student) => student.id !== deleteTarget.id))
+    if (deleteTarget) setRemovedIds(new Set([...removedIds, deleteTarget.id]))
     deleteDialogRef.current?.close()
   }
 
@@ -67,10 +75,17 @@ function StudentRosterPage() {
             </tr>
           </thead>
           <tbody>
+            {(loading || error || students.length === 0) && (
+              <tr>
+                <td colSpan={4} className="px-6 py-10 text-center text-gray-600">
+                  {loading ? '불러오는 중...' : (error ?? '등록된 학생이 없어요.')}
+                </td>
+              </tr>
+            )}
             {students.map((student) => (
               <tr key={student.id} className="border-b border-gray-100 last:border-0">
                 <td className="px-6 py-4 font-bold text-gray-800">{student.name}</td>
-                <td className="px-6 py-4 text-gray-700">{student.school}</td>
+                <td className="px-6 py-4 text-gray-700">{student.school || '—'}</td>
                 <td className="px-6 py-4 text-gray-700">{student.grade}</td>
                 <td className="px-6 py-4">
                   <div className="flex items-center justify-end gap-3">

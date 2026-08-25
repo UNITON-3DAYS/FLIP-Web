@@ -2,20 +2,19 @@ import { useState } from 'react'
 
 import Calendar from '@/components/Calendar'
 import ViewChip from '@/components/ViewChip'
-import { GRADINGS, studentById } from '@/desk/mock'
+import { getDeskGradings } from '@/desk/api'
+import { useAsync } from '@/hooks/useAsync'
 
 function GradingLogPage() {
   const [query, setQuery] = useState('')
   const [date, setDate] = useState<string | null>(null) // null = 전체 기간
   const [pickerOpen, setPickerOpen] = useState(false)
+  const { data: gradings, loading, error } = useAsync(getDeskGradings, [])
 
-  const rows = GRADINGS.map((grading) => ({
-    ...grading,
-    student: studentById(grading.studentId),
-  })).filter(
+  const rows = (gradings ?? []).filter(
     (row) =>
       (!date || row.date === date) &&
-      (row.title.includes(query.trim()) || (row.student?.name ?? '').includes(query.trim())),
+      (row.title.includes(query.trim()) || row.studentName.includes(query.trim())),
   )
 
   return (
@@ -86,18 +85,18 @@ function GradingLogPage() {
             </tr>
           </thead>
           <tbody>
-            {rows.length === 0 ? (
+            {loading || error || rows.length === 0 ? (
               <tr>
                 <td colSpan={6} className="px-6 py-10 text-center text-gray-600">
-                  검색 결과가 없어요.
+                  {loading ? '불러오는 중...' : (error ?? '검색 결과가 없어요.')}
                 </td>
               </tr>
             ) : (
               rows.map((row) => (
                 <tr key={row.id} className="border-b border-gray-100 last:border-0">
                   <td className="px-6 py-4 text-gray-700">{row.date.replaceAll('-', '.')}</td>
-                  <td className="px-6 py-4 font-bold text-gray-800">{row.student?.name}</td>
-                  <td className="px-6 py-4 text-gray-700">{row.student?.grade}</td>
+                  <td className="px-6 py-4 font-bold text-gray-800">{row.studentName}</td>
+                  <td className="px-6 py-4 text-gray-700">{row.studentGrade}</td>
                   <td className="px-6 py-4 text-gray-700">{row.examType}</td>
                   <td className="px-6 py-4 text-gray-700">{row.title}</td>
                   <td className="px-6 py-4 text-right">

@@ -2,22 +2,38 @@ import { useParams } from 'react-router-dom'
 
 import Logo from '@/components/Logo'
 import ScoreTrendChart from '@/components/ScoreTrendChart'
-// BE 미구현: 대시보드와 같은 목 데이터 사용. 리포트 조회 API가 생기면 교체.
-import { GRADINGS, loadComment, studentById } from '@/desk/mock'
+import { getDeskGradings, getDeskStudents } from '@/desk/api'
+// 코멘트는 BE 미구현이라 localStorage 목 — API가 생기면 교체
+import { loadComment } from '@/desk/mock'
+import { useAsync } from '@/hooks/useAsync'
 
 // 학부모 공유용 읽기 전용 리포트 — 로그인 없이 링크로 열람
 export default function ParentReportScreen() {
   const { studentId } = useParams()
-  const student = studentById(studentId)
-  const gradings = GRADINGS.filter((grading) => grading.studentId === studentId).sort((a, b) =>
-    b.date.localeCompare(a.date),
+  const { data, loading, error } = useAsync(
+    () => Promise.all([getDeskStudents(), getDeskGradings()]),
+    [studentId],
   )
+  const student = data?.[0].find((item) => item.id === studentId)
+  // 관리자 목록에 studentId가 없어 이름으로 매칭한다 (동명이인 미고려 — BE 필드 추가 시 교체)
+  const gradings = (data?.[1] ?? [])
+    .filter((grading) => grading.studentName === student?.name)
+    .sort((a, b) => b.date.localeCompare(a.date))
 
-  if (!student || gradings.length === 0) {
+  if (loading) {
     return (
       <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col items-center justify-center bg-white px-6 text-center">
         <Logo />
-        <p className="mt-6 text-sm text-gray-600">리포트를 찾을 수 없어요.</p>
+        <p className="mt-6 text-sm text-gray-600">리포트를 불러오는 중...</p>
+      </main>
+    )
+  }
+
+  if (error || !student || gradings.length === 0) {
+    return (
+      <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col items-center justify-center bg-white px-6 text-center">
+        <Logo />
+        <p className="mt-6 text-sm text-gray-600">{error ?? '리포트를 찾을 수 없어요.'}</p>
       </main>
     )
   }
@@ -35,7 +51,7 @@ export default function ParentReportScreen() {
       <Logo className="text-2xl" />
       <h1 className="mt-6 text-2xl font-semibold text-gray-900">{student.name} 학습 리포트</h1>
       <p className="mt-1 text-sm font-medium text-gray-700">
-        {student.school} · {student.grade} · {period}
+        {[student.school, student.grade, period].filter(Boolean).join(' · ')}
       </p>
 
       <div className="mt-6 grid grid-cols-3 gap-3">

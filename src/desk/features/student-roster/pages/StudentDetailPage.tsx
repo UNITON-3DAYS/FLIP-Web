@@ -3,12 +3,18 @@ import { Link, useParams } from 'react-router-dom'
 
 import ScoreTrendChart from '@/components/ScoreTrendChart'
 import ViewChip from '@/components/ViewChip'
-import { GRADINGS, studentById } from '@/desk/mock'
+import { getDeskGradings, getDeskStudents } from '@/desk/api'
+import { useAsync } from '@/hooks/useAsync'
 
 function StudentDetailPage() {
   const { studentId } = useParams()
-  const student = studentById(studentId)
-  const gradings = GRADINGS.filter((grading) => grading.studentId === studentId)
+  const { data, loading, error } = useAsync(
+    () => Promise.all([getDeskStudents(), getDeskGradings()]),
+    [studentId],
+  )
+  const student = data?.[0].find((item) => item.id === studentId)
+  // 관리자 목록에 studentId가 없어 이름으로 매칭한다 (동명이인 미고려 — BE 필드 추가 시 교체)
+  const gradings = (data?.[1] ?? []).filter((grading) => grading.studentName === student?.name)
   // 점수 추이는 시험지 채점만, 시간순 (팀 결정)
   const examGradings = gradings
     .filter((grading) => grading.examType === '시험지')
@@ -26,10 +32,14 @@ function StudentDetailPage() {
     window.setTimeout(() => setCopied(false), 2000)
   }
 
-  if (!student) {
+  if (loading) {
+    return <section className="text-sm text-gray-600">불러오는 중...</section>
+  }
+
+  if (error || !student) {
     return (
       <section className="text-sm text-gray-600">
-        학생을 찾을 수 없어요.{' '}
+        {error ?? '학생을 찾을 수 없어요.'}{' '}
         <Link to="/students" className="font-bold text-primary-400">
           목록으로
         </Link>
@@ -78,7 +88,7 @@ function StudentDetailPage() {
             <div>
               <p className="text-lg font-bold text-gray-900">{student.name}</p>
               <p className="text-sm text-gray-600">
-                {student.school} · {student.grade}
+                {[student.school, student.grade].filter(Boolean).join(' · ')}
               </p>
             </div>
           </div>
