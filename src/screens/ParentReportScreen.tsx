@@ -40,10 +40,11 @@ export default function ParentReportScreen() {
 
   const average = Math.round(gradings.reduce((sum, g) => sum + g.score, 0) / gradings.length)
   const wrongTotal = gradings.reduce((sum, g) => sum + g.wrongAnswers.length, 0)
-  // 점수 추이는 시험지 채점만, 시간순 (팀 결정)
+  // 점수 추이는 시험지 채점만, 시간순 최근 5회 (팀 결정)
   const examGradings = gradings
     .filter((grading) => grading.examType === '시험지')
-    .sort((a, b) => a.date.localeCompare(b.date))
+    .sort((a, b) => a.date.localeCompare(b.date) || Number(a.id) - Number(b.id))
+    .slice(-5)
   const period = `${gradings[gradings.length - 1].date.replaceAll('-', '.')} ~ ${gradings[0].date.replaceAll('-', '.')}`
 
   return (
