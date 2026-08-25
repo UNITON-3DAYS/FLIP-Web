@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { completeSession, createSession, uploadPage } from '@/services/api'
 import type { GradingSetup } from '@/types'
 
-const INTERVALS = [3, 5, 7]
+const INTERVAL_SEC = 3 // 촬영 주기 고정 (팀 결정 2026-08-25)
 
 export default function CameraScreen() {
   const navigate = useNavigate()
@@ -21,7 +21,6 @@ export default function CameraScreen() {
   const failedRef = useRef<{ seq: number; image: Blob }[]>([])
 
   const [cameraError, setCameraError] = useState(false)
-  const [intervalSec, setIntervalSec] = useState(5)
   const [running, setRunning] = useState(false)
   const [countdown, setCountdown] = useState(0)
   const [shotCount, setShotCount] = useState(0)
@@ -98,20 +97,20 @@ export default function CameraScreen() {
     window.setTimeout(() => setFlash(false), 250)
   }, [uploadShot])
 
-  // 1초마다 카운트다운, 0이 되면 캡처 후 리셋 (intervalSec은 촬영 중 변경 불가)
+  // 1초마다 카운트다운, 0이 되면 캡처 후 리셋
   useEffect(() => {
     if (!running) return
-    let remaining = intervalSec
+    let remaining = INTERVAL_SEC
     const id = window.setInterval(() => {
       remaining -= 1
       if (remaining <= 0) {
         capture()
-        remaining = intervalSec
+        remaining = INTERVAL_SEC
       }
       setCountdown(remaining)
     }, 1000)
     return () => window.clearInterval(id)
-  }, [running, intervalSec, capture])
+  }, [running, capture])
 
   const start = async () => {
     // 사용자 제스처 시점에 AudioContext unlock + 화면 꺼짐 방지
@@ -131,7 +130,7 @@ export default function CameraScreen() {
       setSubmitError(err instanceof Error ? err.message : '채점 세션 생성에 실패했어요.')
       return
     }
-    setCountdown(intervalSec)
+    setCountdown(INTERVAL_SEC)
     setRunning(true)
   }
 
@@ -209,24 +208,6 @@ export default function CameraScreen() {
       </div>
 
       <div className="flex flex-col gap-4 px-6 py-6">
-        {!running && (
-          <div className="flex items-center justify-center gap-3">
-            <span className="text-sm text-gray-600">촬영 간격</span>
-            {INTERVALS.map((sec) => (
-              <button
-                key={sec}
-                type="button"
-                onClick={() => setIntervalSec(sec)}
-                className={`rounded-full px-4 py-1.5 text-sm font-bold ${
-                  intervalSec === sec ? 'bg-primary-300 text-white' : 'bg-gray-800 text-gray-500'
-                }`}
-              >
-                {sec}초
-              </button>
-            ))}
-          </div>
-        )}
-
         {submitError && <p className="text-center text-sm text-red-400">{submitError}</p>}
         {running || submitting ? (
           <button
