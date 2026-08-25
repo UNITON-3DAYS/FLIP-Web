@@ -11,7 +11,7 @@ export default function SplashScreen() {
     const timer = window.setTimeout(() => {
       // 테스트 단계: 세션 유지 없이 항상 로그인부터 (복원 시 loadUser() ? '/home' : '/signup')
       navigate('/signup', { replace: true })
-    }, 1200)
+    }, 2000) // 스플래시 애니메이션 1루프(2s)에 맞춤
     return () => window.clearTimeout(timer)
   }, [navigate])
 
