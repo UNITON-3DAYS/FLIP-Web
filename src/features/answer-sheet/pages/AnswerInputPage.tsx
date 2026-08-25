@@ -2,7 +2,10 @@
 function AnswerInputPage() {
   return (
     <section>
-      <h1 className="text-lg font-semibold">답안 입력</h1>
+      <h1 className="mb-6 text-2xl font-semibold text-gray-900">답안 입력</h1>
+      <div className="flex min-h-[420px] items-center justify-center rounded-lg border border-dashed border-gray-300 text-sm text-gray-400">
+        UI 영역 (TODO)
+      </div>
     </section>
   )
 }
