@@ -1,10 +1,6 @@
-// TODO(ui): 실제 디자인 확정 전까지는 뼈대용 스타일입니다. (검색/알림/유저 메뉴 등은 디자인 확정 후 추가)
+// TODO(ui): 실제 디자인 확정 전까지는 와이어프레임 톤(회색 박스)의 뼈대용 스타일입니다.
 function Topbar() {
-  return (
-    <header className="flex h-16 shrink-0 items-center border-b border-gray-200 bg-white px-8">
-      <span className="text-sm font-medium text-gray-400">FLIP</span>
-    </header>
-  )
+  return <header className="h-20 shrink-0 rounded-2xl bg-gray-200" />
 }
 
 export default Topbar
