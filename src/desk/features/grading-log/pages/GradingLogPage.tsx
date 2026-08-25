@@ -1,28 +1,77 @@
 import { useState } from 'react'
 
+import Calendar from '@/components/Calendar'
 import ViewChip from '@/components/ViewChip'
 import { GRADINGS, studentById } from '@/desk/mock'
 
 function GradingLogPage() {
   const [query, setQuery] = useState('')
+  const [date, setDate] = useState<string | null>(null) // null = 전체 기간
+  const [pickerOpen, setPickerOpen] = useState(false)
 
   const rows = GRADINGS.map((grading) => ({
     ...grading,
     student: studentById(grading.studentId),
   })).filter(
-    (row) => row.title.includes(query.trim()) || (row.student?.name ?? '').includes(query.trim()),
+    (row) =>
+      (!date || row.date === date) &&
+      (row.title.includes(query.trim()) || (row.student?.name ?? '').includes(query.trim())),
   )
 
   return (
     <section>
       <div className="mb-4 flex items-center justify-between">
         <h1 className="text-lg font-bold text-gray-900">채점 내역</h1>
-        <input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="이름·타이틀 검색"
-          className="h-9 w-56 rounded-full border border-gray-300 bg-white px-4 text-sm outline-none placeholder:text-gray-600 focus:border-primary-300"
-        />
+        <div className="flex items-center gap-2">
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setPickerOpen((open) => !open)}
+              aria-label="날짜 선택"
+              className="inline-flex h-9 items-center gap-1.5 rounded-full border border-gray-300 bg-white px-4 text-sm font-medium text-gray-700"
+            >
+              {date ? date.replaceAll('-', '.') : '전체 기간'}
+              {date && (
+                <span
+                  role="button"
+                  aria-label="날짜 필터 해제"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setDate(null)
+                  }}
+                  className="text-gray-600 hover:text-gray-900"
+                >
+                  ✕
+                </span>
+              )}
+            </button>
+            {pickerOpen && (
+              <>
+                <button
+                  type="button"
+                  aria-label="달력 닫기"
+                  onClick={() => setPickerOpen(false)}
+                  className="fixed inset-0 z-10 cursor-default"
+                />
+                <div className="absolute top-full right-0 z-20 mt-2 w-[330px]">
+                  <Calendar
+                    value={date ?? new Date().toLocaleDateString('sv-SE')}
+                    onSelect={(selected) => {
+                      setDate(selected)
+                      setPickerOpen(false)
+                    }}
+                  />
+                </div>
+              </>
+            )}
+          </div>
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="이름·타이틀 검색"
+            className="h-9 w-56 rounded-full border border-gray-300 bg-white px-4 text-sm outline-none placeholder:text-gray-600 focus:border-primary-300"
+          />
+        </div>
       </div>
       <div className="overflow-hidden rounded-[10px] bg-white">
         <table className="w-full text-left text-sm">
