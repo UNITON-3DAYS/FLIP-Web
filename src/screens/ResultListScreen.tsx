@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
+import Calendar from '@/components/Calendar'
 import { useAsync } from '@/hooks/useAsync'
 import { getGradings } from '@/services/api'
 
@@ -18,6 +19,7 @@ export default function ResultListScreen() {
   const navigate = useNavigate()
   const { data: records, loading, error } = useAsync(getGradings, [])
   const [endDate, setEndDate] = useState(new Date().toLocaleDateString('sv-SE'))
+  const [pickerOpen, setPickerOpen] = useState(false)
 
   // 와이어프레임 스펙: 선택일 기준 최근 일주일 범위 필터 (기본: 오늘)
   const end = new Date(`${endDate}T00:00:00`)
@@ -40,18 +42,37 @@ export default function ResultListScreen() {
         <h1 className="text-lg font-bold text-gray-800">채점 내역</h1>
       </div>
 
-      {/* 날짜 필터 pill: 탭하면 OS 네이티브 날짜 피커 */}
-      <label className="relative mt-10 inline-flex h-[29px] w-fit items-center gap-1.5 self-start rounded-full border border-gray-300 bg-white px-3 text-sm font-medium text-gray-700">
-        <CalendarIcon />
-        {endDate.replaceAll('-', '.')}
-        <input
-          type="date"
-          value={endDate}
-          onChange={(e) => e.target.value && setEndDate(e.target.value)}
-          className="absolute inset-0 opacity-0"
+      {/* 날짜 필터 pill: 탭하면 커스텀 달력 (OS별 편차 없이 동일한 UI) */}
+      <div className="relative mt-10 self-start">
+        <button
+          type="button"
+          onClick={() => setPickerOpen((open) => !open)}
           aria-label="날짜 선택"
-        />
-      </label>
+          className="inline-flex h-[29px] items-center gap-1.5 rounded-full border border-gray-300 bg-white px-3 text-sm font-medium text-gray-700"
+        >
+          <CalendarIcon />
+          {endDate.replaceAll('-', '.')}
+        </button>
+        {pickerOpen && (
+          <>
+            <button
+              type="button"
+              aria-label="달력 닫기"
+              onClick={() => setPickerOpen(false)}
+              className="fixed inset-0 z-10 cursor-default"
+            />
+            <div className="absolute top-full left-0 z-20 mt-2 w-[350px] max-w-[85vw]">
+              <Calendar
+                value={endDate}
+                onSelect={(date) => {
+                  setEndDate(date)
+                  setPickerOpen(false)
+                }}
+              />
+            </div>
+          </>
+        )}
+      </div>
 
       {loading ? (
         <p className="mt-20 text-center text-sm text-gray-600">불러오는 중...</p>
