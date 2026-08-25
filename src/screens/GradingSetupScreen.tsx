@@ -1,14 +1,16 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
+import iconBookActive from '@/assets/icon-book-active.svg'
 import iconBook from '@/assets/icon-book.svg'
+import iconExamActive from '@/assets/icon-exam-active.svg'
 import iconExam from '@/assets/icon-exam.svg'
 import Logo from '@/components/Logo'
 import type { ExamType, GradingSetup } from '@/types'
 
-const EXAM_TYPES: { type: ExamType; icon: string }[] = [
-  { type: '시험지', icon: iconExam },
-  { type: '외부 교재', icon: iconBook },
+const EXAM_TYPES: { type: ExamType; icon: string; activeIcon: string }[] = [
+  { type: '시험지', icon: iconExam, activeIcon: iconExamActive },
+  { type: '외부 교재', icon: iconBook, activeIcon: iconBookActive },
 ]
 const BOOKS = ['쎈 2-1', '개념원리 2-1', 'RPM 2-1', '일품 2-1']
 
@@ -42,21 +44,26 @@ export default function GradingSetupScreen() {
       <h1 className="relative mt-[52px] text-2xl font-bold">문제 유형 선택</h1>
 
       <div className="relative mt-12 grid grid-cols-2 gap-[14px]">
-        {EXAM_TYPES.map(({ type, icon }) => (
-          <button
-            key={type}
-            type="button"
-            onClick={() => setExamType(type)}
-            className={`flex h-[117px] flex-col items-center justify-center gap-3 rounded-xl border ${
-              examType === type
-                ? 'border-primary-300 bg-primary-100'
-                : 'border-transparent bg-gray-200'
-            }`}
-          >
-            <img src={icon} alt="" className="h-[35px]" />
-            <span className="text-sm font-medium text-gray-800">{type}</span>
-          </button>
-        ))}
+        {EXAM_TYPES.map(({ type, icon, activeIcon }) => {
+          const active = examType === type
+          return (
+            <button
+              key={type}
+              type="button"
+              onClick={() => setExamType(type)}
+              className={`flex h-[117px] flex-col items-center justify-center gap-3 rounded-xl border-[3px] ${
+                active ? 'border-primary-300 bg-[#EDFFFD]' : 'border-transparent bg-gray-200'
+              }`}
+            >
+              <img src={active ? activeIcon : icon} alt="" className="h-[35px]" />
+              <span
+                className={`text-sm ${active ? 'font-bold text-gray-800' : 'font-medium text-gray-600'}`}
+              >
+                {type}
+              </span>
+            </button>
+          )
+        })}
       </div>
 
       <div className="relative mt-7 flex flex-col gap-4">
@@ -85,7 +92,7 @@ export default function GradingSetupScreen() {
           <input
             className={controlClass}
             value={title}
-            placeholder="예) 오답 점검 1회차"
+            placeholder="타이틀 입력"
             onChange={(e) => setTitle(e.target.value)}
           />
         </label>
