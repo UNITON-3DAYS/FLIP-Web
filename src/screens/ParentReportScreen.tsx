@@ -39,7 +39,10 @@ export default function ParentReportScreen() {
   }
 
   const average = Math.round(gradings.reduce((sum, g) => sum + g.score, 0) / gradings.length)
-  const wrongTotal = gradings.reduce((sum, g) => sum + g.wrongAnswers.length, 0)
+  // 평균 오답: 소수 1자리 (정수로 떨어지면 그대로)
+  const wrongAverage =
+    Math.round((gradings.reduce((sum, g) => sum + g.wrongAnswers.length, 0) / gradings.length) * 10) /
+    10
   // 점수 추이는 시험지 채점만, 시간순 최근 5회 (팀 결정)
   const examGradings = gradings
     .filter((grading) => grading.examType === '시험지')
@@ -65,8 +68,8 @@ export default function ParentReportScreen() {
           <p className="mt-1 text-2xl font-semibold text-primary-300">{average}점</p>
         </div>
         <div className="rounded-[10px] bg-white p-4 text-center">
-          <p className="text-xs font-medium text-gray-700">오답 수</p>
-          <p className="mt-1 text-2xl font-semibold text-secondary">{wrongTotal}</p>
+          <p className="text-xs font-medium text-gray-700">평균 오답 수</p>
+          <p className="mt-1 text-2xl font-semibold text-secondary">{wrongAverage}</p>
         </div>
       </div>
 
