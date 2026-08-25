@@ -28,6 +28,27 @@ export default function CameraScreen() {
   const [flash, setFlash] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
+  const [exitConfirm, setExitConfirm] = useState(false)
+  const wasRunningRef = useRef(false)
+
+  // 촬영분이 있으면 확인 모달을 띄우고, 그동안 자동 촬영은 멈춘다
+  const requestExit = () => {
+    if (!running && shotCount === 0) {
+      navigate(-1)
+      return
+    }
+    wasRunningRef.current = running
+    setRunning(false)
+    setExitConfirm(true)
+  }
+
+  const cancelExit = () => {
+    setExitConfirm(false)
+    if (wasRunningRef.current) {
+      setCountdown(INTERVAL_SEC)
+      setRunning(true)
+    }
+  }
 
   // 카메라 스트림 연결/해제
   useEffect(() => {
@@ -196,7 +217,7 @@ export default function CameraScreen() {
         </div>
         <button
           type="button"
-          onClick={() => navigate(-1)}
+          onClick={requestExit}
           aria-label="닫기"
           className="absolute top-4 right-4 text-2xl text-white"
         >
@@ -240,6 +261,35 @@ export default function CameraScreen() {
       </div>
 
       {submitting && <GradingWaiting />}
+
+      {exitConfirm && (
+        <div className="absolute inset-0 z-40 flex items-center justify-center bg-black/60 px-10">
+          <div className="w-full rounded-2xl bg-white p-6 text-center">
+            <p className="text-lg font-bold text-gray-900">촬영을 그만둘까요?</p>
+            {shotCount > 0 && (
+              <p className="mt-2 text-sm text-gray-600">
+                지금까지 촬영한 {shotCount}장은 저장되지 않아요.
+              </p>
+            )}
+            <div className="mt-6 flex gap-3">
+              <button
+                type="button"
+                onClick={() => navigate(-1)}
+                className="flex-1 rounded-xl bg-gray-200 py-3 font-bold text-gray-700"
+              >
+                나가기
+              </button>
+              <button
+                type="button"
+                onClick={cancelExit}
+                className="flex-1 rounded-xl bg-primary-300 py-3 font-bold text-white"
+              >
+                계속 촬영
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   )
 }
