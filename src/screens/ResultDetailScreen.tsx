@@ -38,18 +38,18 @@ export default function ResultDetailScreen() {
   }
 
   return (
-    <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-white px-6 pt-[calc(env(safe-area-inset-top)+22px)] pb-8">
+    <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-white px-6 pt-[calc(env(safe-area-inset-top)+19px)] pb-8">
       <button
         type="button"
         onClick={() => (fromGrading ? navigate('/results', { replace: true }) : navigate(-1))}
         className="self-start"
         aria-label="뒤로"
       >
-        <img src={iconBack} alt="" className="h-4" />
+        <img src={iconBack} alt="" className="h-6" />
       </button>
 
-      <p className="mt-10 text-lg text-gray-700">{formatKoreanDate(record.date)}</p>
-      <h1 className="mt-1 text-2xl font-bold text-gray-900">{record.title}</h1>
+      <p className="mt-9 text-lg font-medium text-gray-700">{formatKoreanDate(record.date)}</p>
+      <h1 className="mt-1 text-2xl font-semibold text-gray-900">{record.title}</h1>
 
       <div className="mt-3">
         <ScoreDonut
@@ -59,7 +59,7 @@ export default function ResultDetailScreen() {
         />
       </div>
 
-      <h2 className="mt-5 text-lg font-bold text-gray-900">
+      <h2 className="mt-5 text-base font-semibold text-gray-1000">
         오답 <span className="text-secondary">{record.wrongAnswers.length}</span>
       </h2>
       {record.wrongAnswers.length === 0 ? (
@@ -68,19 +68,19 @@ export default function ResultDetailScreen() {
         <div className="mt-2 overflow-hidden rounded-2xl border border-gray-300 bg-white">
           <table className="w-full text-center text-lg">
             <thead>
-              <tr className="border-b border-gray-300 bg-gray-100 text-gray-800">
-                <th className="py-[17px] text-[17px] font-bold">페이지</th>
-                <th className="py-[17px] text-[17px] font-bold">문제 번호</th>
+              <tr className="border-b border-gray-300 bg-gray-200 text-gray-800">
+                <th className="py-[17px] text-base font-semibold">페이지</th>
+                <th className="py-[17px] text-base font-semibold">문제 번호</th>
               </tr>
             </thead>
             <tbody>
               {record.wrongAnswers.map((wrong, index) => (
                 <tr key={index} className="border-b border-gray-300 last:border-0">
-                  <td className="py-5 font-bold text-gray-900">
+                  <td className="py-5 font-semibold text-gray-900">
                     {wrong.page != null ? `${wrong.page}p` : '—'}
                   </td>
                   <td className="py-5">
-                    <span className="inline-flex size-8 items-center justify-center rounded-full bg-[#FFDCE7] font-bold text-secondary">
+                    <span className="inline-flex size-8 items-center justify-center rounded-full bg-[#FFD6E2] font-semibold text-secondary">
                       {wrong.number}
                     </span>
                   </td>

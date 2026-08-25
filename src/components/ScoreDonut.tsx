@@ -25,8 +25,8 @@ export default function ScoreDonut({ score, correctCount, totalCount }: ScoreDon
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <p className="text-4xl font-black text-primary-300">{score}점</p>
-        <p className="mt-1 text-lg font-bold text-gray-800">
+        <p className="text-[40px] leading-[48px] font-semibold text-primary-300">{score}점</p>
+        <p className="text-xl font-medium text-gray-800">
           {correctCount}/{totalCount}
         </p>
       </div>
