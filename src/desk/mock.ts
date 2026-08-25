@@ -118,6 +118,38 @@ export const GRADINGS: DeskGrading[] = [
     totalCount: 20,
     wrongAnswers: [{ page: 3, number: 14 }],
   },
+  // s1 점수 추이 그래프 확인용 과거 기록
+  {
+    id: 'g6',
+    studentId: 's1',
+    date: '2026-08-20',
+    examType: '시험지',
+    title: '쪽지시험 2회',
+    range: 'p.1 ~ p.2',
+    score: 75,
+    correctCount: 7,
+    totalCount: 10,
+    wrongAnswers: [
+      { page: 1, number: 3 },
+      { page: 2, number: 6 },
+    ],
+  },
+  {
+    id: 'g7',
+    studentId: 's1',
+    date: '2026-08-18',
+    examType: '시험지',
+    title: '쪽지시험 1회',
+    range: 'p.1 ~ p.2',
+    score: 70,
+    correctCount: 7,
+    totalCount: 10,
+    wrongAnswers: [
+      { page: 1, number: 4 },
+      { page: 2, number: 7 },
+      { page: 2, number: 10 },
+    ],
+  },
 ]
 
 export const ANSWER_SHEETS: DeskAnswerSheet[] = [
