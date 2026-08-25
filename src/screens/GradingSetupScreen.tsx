@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 
 import iconBookActive from '@/assets/icon-book-active.svg'
 import iconBook from '@/assets/icon-book.svg'
+import iconChevronDown from '@/assets/icon-chevron-down.svg'
 import iconExamActive from '@/assets/icon-exam-active.svg'
 import iconExam from '@/assets/icon-exam.svg'
 import Logo from '@/components/Logo'
@@ -71,7 +72,7 @@ export default function GradingSetupScreen() {
           <label className={fieldClass}>
             <span className={labelClass}>교재</span>
             <select
-              className={controlClass}
+              className={`${controlClass} appearance-none ${bookName === '' ? 'text-gray-600' : ''}`}
               value={bookName}
               onChange={(e) => setBookName(e.target.value)}
             >
@@ -84,6 +85,11 @@ export default function GradingSetupScreen() {
                 </option>
               ))}
             </select>
+            <img
+              src={iconChevronDown}
+              alt=""
+              className="pointer-events-none absolute top-1/2 right-4 w-4 -translate-y-1/2"
+            />
           </label>
         )}
 

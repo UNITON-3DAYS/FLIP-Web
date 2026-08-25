@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
+import iconChevronDown from '@/assets/icon-chevron-down.svg'
 import iconClear from '@/assets/icon-clear.svg'
 import Logo from '@/components/Logo'
 import { saveUser } from '@/services/records'
@@ -42,7 +43,8 @@ export default function SignUpScreen() {
 
   return (
     <main className="relative mx-auto flex min-h-dvh w-full max-w-md flex-col overflow-hidden bg-white px-6 pt-14 pb-8">
-      <div className="pointer-events-none absolute -top-24 -right-20 size-72 rounded-full bg-[radial-gradient(circle,rgba(153,236,231,0.54)_0%,rgba(255,255,255,0)_100%)]" />
+      {/* 디자인 엘립스: 좌상단, 문제 유형 선택 화면과 동일 스펙 */}
+      <div className="pointer-events-none absolute -top-[88px] -left-[115px] h-[426px] w-[459px] bg-[radial-gradient(50%_50%_at_50%_50%,rgba(153,236,231,0.9)_0%,rgba(255,255,255,0)_100%)] opacity-20" />
       <Logo />
       <h1 className="mt-8 text-2xl font-bold">내 정보 입력</h1>
 
@@ -62,7 +64,7 @@ export default function SignUpScreen() {
           <label className={fieldClass}>
             <span className={labelClass}>학교</span>
             <select
-              className={controlClass}
+              className={`${controlClass} appearance-none ${school === '' ? 'text-gray-600' : ''}`}
               value={school}
               onChange={(e) => setSchool(e.target.value)}
             >
@@ -75,11 +77,16 @@ export default function SignUpScreen() {
                 </option>
               ))}
             </select>
+            <img
+              src={iconChevronDown}
+              alt=""
+              className="pointer-events-none absolute top-1/2 right-4 w-4 -translate-y-1/2"
+            />
           </label>
           <label className={fieldClass}>
             <span className={labelClass}>학년</span>
             <select
-              className={controlClass}
+              className={`${controlClass} appearance-none ${grade === '' ? 'text-gray-600' : ''}`}
               value={grade}
               onChange={(e) => setGrade(e.target.value)}
             >
@@ -92,6 +99,11 @@ export default function SignUpScreen() {
                 </option>
               ))}
             </select>
+            <img
+              src={iconChevronDown}
+              alt=""
+              className="pointer-events-none absolute top-1/2 right-4 w-4 -translate-y-1/2"
+            />
           </label>
         </div>
 
