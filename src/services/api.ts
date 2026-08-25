@@ -153,30 +153,49 @@ interface GradingListResponse {
   }[]
 }
 
-// 계약(노션): year/month/day 쿼리로 하루치 조회. 서버가 날짜 필터링을 담당한다.
-export async function getGradings(date: string): Promise<GradingSummary[]> {
-  if (!BASE) return loadRecords().filter((record) => record.date === date)
-  const [year, month, day] = date.split('-').map(Number)
-  const body = await request<GradingListResponse>(
-    `/grading-records?year=${year}&month=${month}&day=${day}`,
-  )
-  return body.gradingRecords.map((item) => ({
-    id: String(item.gradingRecordId),
-    title: item.worksheetTitle,
-    range:
-      item.pageStart != null && item.pageEnd != null
-        ? `p.${item.pageStart} ~ p.${item.pageEnd}`
-        : undefined,
-    date: toIsoDate(item.createdAt),
-  }))
+const addDays = (iso: string, n: number) => {
+  const d = new Date(`${iso}T00:00:00`)
+  d.setDate(d.getDate() + n)
+  return d.toLocaleDateString('sv-SE')
 }
 
-// createdAt이 ISO("2026-08-24…")든 명세 예시의 한국어("2026년 8월 24일")든 YYYY-MM-DD로 정규화
+// 계약(노션): year/month/day 쿼리로 하루치 조회.
+// ponytail: 서버가 UTC 기준으로 저장·필터링해 KST 하루가 UTC 이틀(전날 15시~당일 15시)에 걸친다.
+// BE 타임존이 Asia/Seoul로 바뀔 때까지 전날+당일 두 버킷을 조회해 로컬 날짜로 거른다. 바뀌면 단일 조회로 복원.
+export async function getGradings(date: string): Promise<GradingSummary[]> {
+  if (!BASE) return loadRecords().filter((record) => record.date === date)
+  const buckets = await Promise.all(
+    [addDays(date, -1), date].map((day) => {
+      const [y, m, d] = day.split('-').map(Number)
+      return request<GradingListResponse>(`/grading-records?year=${y}&month=${m}&day=${d}`)
+    }),
+  )
+  return buckets
+    .flatMap((body) => body.gradingRecords)
+    .map((item) => ({
+      id: String(item.gradingRecordId),
+      title: item.worksheetTitle,
+      range:
+        item.pageStart != null && item.pageEnd != null
+          ? `p.${item.pageStart} ~ p.${item.pageEnd}`
+          : undefined,
+      date: toIsoDate(item.createdAt),
+    }))
+    .filter((item) => item.date === date)
+    .sort((a, b) => Number(b.id) - Number(a.id)) // 서버 id는 생성 순 증가 — 최신순 정렬
+}
+
+// createdAt이 ISO("2026-08-24…")든 명세 예시의 한국어("2026년 8월 24일")든 YYYY-MM-DD로 정규화.
+// 서버 일시는 타임존 표기가 없는 UTC라서 'Z'를 붙여 UTC로 파싱한 뒤 로컬(KST) 날짜로 변환한다.
 function toIsoDate(value: string): string {
   const korean = value.match(/(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일/)
   if (korean) {
     const [, year, month, day] = korean
     return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+  }
+  if (value.includes('T')) {
+    const iso = /(?:Z|[+-]\d{2}:?\d{2})$/.test(value) ? value : `${value}Z`
+    return new Date(iso).toLocaleDateString('sv-SE')
   }
   return value.slice(0, 10)
 }
