@@ -26,7 +26,10 @@ export default function CameraScreen() {
   // 카메라 스트림 연결/해제
   useEffect(() => {
     navigator.mediaDevices
-      .getUserMedia({ video: { facingMode: 'environment' } })
+      // ideal이라 기기가 지원하는 최대치까지만 올라간다 (미지원 기기도 실패하지 않음)
+      .getUserMedia({
+        video: { facingMode: 'environment', width: { ideal: 4096 }, height: { ideal: 2160 } },
+      })
       .then((stream) => {
         streamRef.current = stream
         if (videoRef.current) videoRef.current.srcObject = stream
@@ -46,7 +49,7 @@ export default function CameraScreen() {
     canvas.width = video.videoWidth
     canvas.height = video.videoHeight
     canvas.getContext('2d')?.drawImage(video, 0, 0)
-    setShots((prev) => [...prev, canvas.toDataURL('image/jpeg', 0.7)])
+    setShots((prev) => [...prev, canvas.toDataURL('image/jpeg', 0.92)])
 
     // 버저: 비프음 + 진동(Android) + 화면 플래시(iOS 보완)
     const ctx = audioCtxRef.current
