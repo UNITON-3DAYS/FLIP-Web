@@ -15,6 +15,9 @@ const POLL_TIMEOUT_MS = 30_000 // 마지막 장 기준 채점 ~10초 + 여유 (�
 // 목 모드용 세션 보관 (메모리)
 const mockSessions = new Map<string, { setup: GradingSetup; pages: Set<number> }>()
 
+// 세션별 마지막(최대 seq) 업로드의 gradingImageId — 명세상 세션 종료 PATCH body에 필요
+const lastImageBySession = new Map<string, { seq: number; gradingImageId: number }>()
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {
     ...init,
@@ -54,11 +57,17 @@ export async function uploadPage(sessionId: string, seq: number, image: Blob): P
     method: 'POST',
     body: form,
   })
-  await request(`/grading-records/${sessionId}/images`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ imageUrl: fileUrl }),
-  })
+  const { gradingImageId } = await request<{ gradingImageId: number }>(
+    `/grading-records/${sessionId}/images`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ imageUrl: fileUrl }),
+    },
+  )
+  // 업로드는 병렬이라 완료 순서가 아니라 촬영 순서(seq) 기준으로 마지막 장을 기억한다
+  const prev = lastImageBySession.get(sessionId)
+  if (!prev || seq > prev.seq) lastImageBySession.set(sessionId, { seq, gradingImageId })
 }
 
 // 촬영 종료: 세션 종료(PATCH) 후 채점이 끝날 때까지 상세 조회를 폴링한다.
@@ -69,7 +78,14 @@ export async function completeSession(sessionId: string): Promise<GradingRecord>
     mockSessions.delete(sessionId)
     return gradeAndSave(session.setup, session.pages.size)
   }
-  await request(`/grading-records/${sessionId}`, { method: 'PATCH' })
+  // 명세: body에 마지막 업로드의 gradingImageId를 실어야 한다
+  const lastImage = lastImageBySession.get(sessionId)
+  await request(`/grading-records/${sessionId}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ gradingImageId: lastImage?.gradingImageId }),
+  })
+  lastImageBySession.delete(sessionId)
   const deadline = Date.now() + POLL_TIMEOUT_MS
   while (Date.now() < deadline) {
     try {
@@ -110,6 +126,16 @@ export async function getGradings(date: string): Promise<GradingSummary[]> {
   }))
 }
 
+// createdAt이 ISO("2026-08-24…")든 명세 예시의 한국어("2026년 8월 24일")든 YYYY-MM-DD로 정규화
+function toIsoDate(value: string): string {
+  const korean = value.match(/(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일/)
+  if (korean) {
+    const [, year, month, day] = korean
+    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+  }
+  return value.slice(0, 10)
+}
+
 interface GradingDetailResponse {
   worksheetTitle: string
   createdAt: string
@@ -129,7 +155,7 @@ export async function getGrading(id: string): Promise<GradingRecord> {
   return {
     id,
     title: detail.worksheetTitle,
-    date: detail.createdAt.slice(0, 10), // ISO 8601 가정 (BE 합의)
+    date: toIsoDate(detail.createdAt),
     score: detail.score,
     correctCount: detail.correctCount,
     totalCount: detail.totalCount,
