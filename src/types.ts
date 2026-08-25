@@ -13,17 +13,21 @@ export interface GradingSetup {
 }
 
 export interface WrongAnswer {
-  page: number
+  page?: number // 실서버 상세 응답에는 페이지 정보가 없음
   number: number
 }
 
-export interface GradingRecord {
+// 목록 조회 응답에는 점수·오답 정보가 없어 카드 표시용 요약만 둔다
+export interface GradingSummary {
   id: string
-  examType: ExamType
   title: string
-  bookName?: string
-  range: string
+  range?: string
   date: string
+}
+
+export interface GradingRecord extends GradingSummary {
+  examType?: ExamType
+  bookName?: string
   score: number
   correctCount: number
   totalCount: number

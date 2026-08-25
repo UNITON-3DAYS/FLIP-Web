@@ -9,16 +9,10 @@ import { getGradings } from '@/services/api'
 
 export default function ResultListScreen() {
   const navigate = useNavigate()
-  const { data: records, loading, error } = useAsync(getGradings, [])
-  const [endDate, setEndDate] = useState(new Date().toLocaleDateString('sv-SE'))
+  // 선택한 날짜의 하루치만 조회 (기본: 오늘). 날짜를 바꾸면 재조회한다.
+  const [date, setDate] = useState(new Date().toLocaleDateString('sv-SE'))
+  const { data: records, loading, error } = useAsync(() => getGradings(date), [date])
   const [pickerOpen, setPickerOpen] = useState(false)
-
-  // 와이어프레임 스펙: 선택일 기준 최근 일주일 범위 필터 (기본: 오늘)
-  const end = new Date(`${endDate}T00:00:00`)
-  const start = new Date(end)
-  start.setDate(end.getDate() - 6)
-  const startDate = start.toLocaleDateString('sv-SE')
-  const filtered = records?.filter((r) => r.date >= startDate && r.date <= endDate) ?? null
 
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-gray-200 px-5 pt-12 pb-8">
@@ -43,7 +37,7 @@ export default function ResultListScreen() {
           className="inline-flex h-[29px] items-center gap-1.5 rounded-full border border-gray-300 bg-white px-3 text-sm font-medium text-gray-700"
         >
           <img src={iconCalendar} alt="" className="h-3.5" />
-          {endDate.replaceAll('-', '.')}
+          {date.replaceAll('-', '.')}
         </button>
         {pickerOpen && (
           <>
@@ -55,9 +49,9 @@ export default function ResultListScreen() {
             />
             <div className="absolute top-full left-0 z-20 mt-2 w-[350px] max-w-[85vw]">
               <Calendar
-                value={endDate}
-                onSelect={(date) => {
-                  setEndDate(date)
+                value={date}
+                onSelect={(selected) => {
+                  setDate(selected)
                   setPickerOpen(false)
                 }}
               />
@@ -74,15 +68,15 @@ export default function ResultListScreen() {
           <br />
           {error}
         </p>
-      ) : !filtered || filtered.length === 0 ? (
+      ) : !records || records.length === 0 ? (
         <p className="mt-20 text-center text-sm text-gray-600">
-          이 기간에는 채점 내역이 없어요.
+          이 날에는 채점 내역이 없어요.
           <br />
           날짜를 바꾸거나 첫 채점을 시작해보세요!
         </p>
       ) : (
         <ul className="mt-4 flex flex-col gap-3">
-          {filtered.map((record) => (
+          {records.map((record) => (
             <li key={record.id}>
               <Link
                 to={`/results/${record.id}`}

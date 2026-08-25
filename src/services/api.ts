@@ -1,21 +1,28 @@
 import { findRecord, gradeAndSave, loadRecords } from '@/services/records'
-import type { ExamType, GradingRecord, GradingSetup } from '@/types'
+import type { ExamType, GradingRecord, GradingSetup, GradingSummary } from '@/types'
 
-// docs/api-spec.md v0.2 구조. VITE_API_BASE_URL이 없으면 목(localStorage)으로 동작한다.
+// Notion API 명세서 기준 (Base URL 예: https://34.50.17.22.nip.io/api)
+// VITE_API_BASE_URL이 없으면 목(localStorage)으로 동작한다.
 const BASE = import.meta.env.VITE_API_BASE_URL as string | undefined
+// ponytail: 학생 로그인/조회 API 미작성 — env 고정값으로 임시 처리. 로그인 붙으면 교체.
+const STUDENT_ID = (import.meta.env.VITE_STUDENT_ID as string | undefined) ?? '1'
 
-const EXAM_TYPE_TO_API: Record<ExamType, string> = { 시험지: 'EXAM', '외부 교재': 'BOOK' }
+const SOURCE_BY_EXAM_TYPE: Record<ExamType, string> = { 시험지: 'INHOUSE', '외부 교재': 'EXTERNAL' }
+
+const POLL_INTERVAL_MS = 2500
+const POLL_TIMEOUT_MS = 30_000 // 마지막 장 기준 채점 ~10초 + 여유 (팀 결정 2026-08-25)
 
 // 목 모드용 세션 보관 (메모리)
 const mockSessions = new Map<string, { setup: GradingSetup; pages: Set<number> }>()
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${BASE}${path}`, init)
-  if (!res.ok) {
-    const body = (await res.json().catch(() => null)) as { error?: { message?: string } } | null
-    throw new Error(body?.error?.message ?? `요청 실패 (${res.status})`)
-  }
-  return res.json() as Promise<T>
+  const res = await fetch(`${BASE}${path}`, {
+    ...init,
+    headers: { studentId: STUDENT_ID, ...init?.headers },
+  })
+  if (!res.ok) throw new Error(`요청 실패 (${res.status})`)
+  const text = await res.text()
+  return (text ? JSON.parse(text) : undefined) as T
 }
 
 export async function createSession(setup: GradingSetup): Promise<string> {
@@ -24,16 +31,15 @@ export async function createSession(setup: GradingSetup): Promise<string> {
     mockSessions.set(id, { setup, pages: new Set() })
     return id
   }
-  const body = await request<{ id: string }>('/api/grading-sessions', {
+  const body = await request<{ gradingRecordId: number }>('/grading-records', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      examType: EXAM_TYPE_TO_API[setup.examType],
-      title: setup.title,
-      bookName: setup.bookName ?? null,
+      worksheetSource: SOURCE_BY_EXAM_TYPE[setup.examType],
+      worksheetTitle: setup.title,
     }),
   })
-  return body.id
+  return String(body.gradingRecordId)
 }
 
 export async function uploadPage(sessionId: string, seq: number, image: Blob): Promise<void> {
@@ -41,12 +47,21 @@ export async function uploadPage(sessionId: string, seq: number, image: Blob): P
     mockSessions.get(sessionId)?.pages.add(seq)
     return
   }
+  // 2단계: 스토리지에 파일 업로드 → 발급된 URL을 세션에 등록
   const form = new FormData()
-  form.append('image', image, `page-${seq}.jpg`)
-  form.append('seq', String(seq))
-  await request(`/api/grading-sessions/${sessionId}/pages`, { method: 'POST', body: form })
+  form.append('file', image, `page-${seq}.jpg`)
+  const { fileUrl } = await request<{ fileUrl: string }>('/storage/upload', {
+    method: 'POST',
+    body: form,
+  })
+  await request(`/grading-records/${sessionId}/images`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ imageUrl: fileUrl }),
+  })
 }
 
+// 촬영 종료: 세션 종료(PATCH) 후 채점이 끝날 때까지 상세 조회를 폴링한다.
 export async function completeSession(sessionId: string): Promise<GradingRecord> {
   if (!BASE) {
     const session = mockSessions.get(sessionId)
@@ -54,13 +69,54 @@ export async function completeSession(sessionId: string): Promise<GradingRecord>
     mockSessions.delete(sessionId)
     return gradeAndSave(session.setup, session.pages.size)
   }
-  return request<GradingRecord>(`/api/grading-sessions/${sessionId}/complete`, { method: 'POST' })
+  await request(`/grading-records/${sessionId}`, { method: 'PATCH' })
+  const deadline = Date.now() + POLL_TIMEOUT_MS
+  while (Date.now() < deadline) {
+    try {
+      // status: IN_PROGRESS(촬영 중) / GRADING(채점 처리 중) / COMPLETED(완료)
+      const { status } = await request<{ status: string }>(
+        `/grading-records/${sessionId}/status`,
+      )
+      if (status === 'COMPLETED') return getGrading(sessionId)
+    } catch {
+      // 일시적 오류는 무시하고 재시도
+    }
+    await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS))
+  }
+  throw new Error('채점이 오래 걸리고 있어요. 잠시 후 채점 내역에서 확인해주세요.')
 }
 
-export async function getGradings(): Promise<GradingRecord[]> {
-  if (!BASE) return loadRecords()
-  const body = await request<{ items: GradingRecord[] }>('/api/gradings')
-  return body.items
+interface GradingListResponse {
+  gradingRecords: {
+    gradingRecordId: number
+    worksheetTitle: string
+    pageStart: number
+    pageEnd: number
+  }[]
+}
+
+// date(YYYY-MM-DD)의 하루치 내역만 조회한다 (명세: year/month/day 쿼리 필수)
+export async function getGradings(date: string): Promise<GradingSummary[]> {
+  if (!BASE) return loadRecords().filter((record) => record.date === date)
+  const [year, month, day] = date.split('-').map(Number)
+  const body = await request<GradingListResponse>(
+    `/grading-records?year=${year}&month=${month}&day=${day}`,
+  )
+  return body.gradingRecords.map((item) => ({
+    id: String(item.gradingRecordId),
+    title: item.worksheetTitle,
+    range: `p.${item.pageStart} ~ p.${item.pageEnd}`,
+    date,
+  }))
+}
+
+interface GradingDetailResponse {
+  worksheetTitle: string
+  createdAt: string
+  correctCount: number
+  totalCount: number
+  score: number
+  wrongAnswers: { questionNumber: number; correctAnswer: string; studentAnswer: string }[]
 }
 
 export async function getGrading(id: string): Promise<GradingRecord> {
@@ -69,5 +125,14 @@ export async function getGrading(id: string): Promise<GradingRecord> {
     if (!record) throw new Error('채점 결과를 찾을 수 없어요.')
     return record
   }
-  return request<GradingRecord>(`/api/gradings/${id}`)
+  const detail = await request<GradingDetailResponse>(`/grading-records/${id}`)
+  return {
+    id,
+    title: detail.worksheetTitle,
+    date: detail.createdAt.slice(0, 10), // ISO 8601 가정 (BE 합의)
+    score: detail.score,
+    correctCount: detail.correctCount,
+    totalCount: detail.totalCount,
+    wrongAnswers: detail.wrongAnswers.map((wrong) => ({ number: wrong.questionNumber })),
+  }
 }

@@ -1,5 +1,6 @@
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 
+import iconBack from '@/assets/icon-back.svg'
 import ScoreDonut from '@/components/ScoreDonut'
 import { useAsync } from '@/hooks/useAsync'
 import { getGrading } from '@/services/api'
@@ -41,10 +42,10 @@ export default function ResultDetailScreen() {
       <button
         type="button"
         onClick={() => (fromGrading ? navigate('/results', { replace: true }) : navigate(-1))}
-        className="self-start text-xl text-gray-800"
+        className="self-start"
         aria-label="뒤로"
       >
-        &lt;
+        <img src={iconBack} alt="" className="h-4" />
       </button>
 
       <p className="mt-8 text-lg text-gray-600">{formatKoreanDate(record.date)}</p>
@@ -75,7 +76,9 @@ export default function ResultDetailScreen() {
             <tbody>
               {record.wrongAnswers.map((wrong, index) => (
                 <tr key={index} className="border-b border-gray-300 last:border-0">
-                  <td className="py-5 font-bold text-gray-800">{wrong.page}p</td>
+                  <td className="py-5 font-bold text-gray-800">
+                    {wrong.page != null ? `${wrong.page}p` : '—'}
+                  </td>
                   <td className="py-5">
                     <span className="inline-flex size-8 items-center justify-center rounded-full bg-[#FFDCE7] font-bold text-secondary">
                       {wrong.number}
