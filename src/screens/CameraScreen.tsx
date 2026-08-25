@@ -183,11 +183,11 @@ export default function CameraScreen() {
       <div className="relative flex-1 overflow-hidden">
         <video ref={videoRef} autoPlay playsInline muted className="size-full object-cover" />
         {/* 촬영 가이드 브래킷 */}
-        <div className="pointer-events-none absolute inset-8">
-          <div className="absolute top-0 left-0 size-10 rounded-tl border-t-4 border-l-4 border-primary-300" />
-          <div className="absolute top-0 right-0 size-10 rounded-tr border-t-4 border-r-4 border-primary-300" />
-          <div className="absolute bottom-0 left-0 size-10 rounded-bl border-b-4 border-l-4 border-primary-300" />
-          <div className="absolute right-0 bottom-0 size-10 rounded-br border-r-4 border-b-4 border-primary-300" />
+        <div className="pointer-events-none absolute inset-x-9 inset-y-14">
+          <div className="absolute top-0 left-0 h-12 w-18 rounded-tl-xl border-t-8 border-l-8 border-primary-300" />
+          <div className="absolute top-0 right-0 h-12 w-18 rounded-tr-xl border-t-8 border-r-8 border-primary-300" />
+          <div className="absolute bottom-0 left-0 h-12 w-18 rounded-bl-xl border-b-8 border-l-8 border-primary-300" />
+          <div className="absolute right-0 bottom-0 h-12 w-18 rounded-br-xl border-r-8 border-b-8 border-primary-300" />
         </div>
         <button
           type="button"
@@ -219,13 +219,15 @@ export default function CameraScreen() {
             {submitting ? '채점 중...' : '촬영 종료 · 채점하기'}
           </button>
         ) : (
-          // 디자인의 원형 셔터 버튼
+          // 디자인의 원형 셔터: 그라디언트 링 + 흰 코어
           <button
             type="button"
             onClick={() => void start()}
             aria-label="촬영 시작"
-            className="size-16 self-center rounded-full bg-white outline-4 outline-offset-4 outline-primary-300"
-          />
+            className="size-20 self-center rounded-full bg-gradient-to-b from-primary-100 to-primary-300 p-[7px]"
+          >
+            <span className="block size-full rounded-full bg-white" />
+          </button>
         )}
         <p className="text-center text-xs text-gray-700">
           버저가 울릴 때마다 자동 촬영됩니다. 소리에 맞춰 페이지를 넘겨주세요.
