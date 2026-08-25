@@ -107,24 +107,21 @@ interface GradingListResponse {
   gradingRecords: {
     gradingRecordId: number
     worksheetTitle: string
-    pageStart: number
-    pageEnd: number
+    createdAt: string
   }[]
 }
 
-// date(YYYY-MM-DD)의 하루치 내역만 조회한다 (명세: year/month/day 쿼리 필수)
+// 서버(스웨거)는 전체 목록만 제공 — date(YYYY-MM-DD) 필터는 클라이언트에서 createdAt 기준으로 건다
 export async function getGradings(date: string): Promise<GradingSummary[]> {
   if (!BASE) return loadRecords().filter((record) => record.date === date)
-  const [year, month, day] = date.split('-').map(Number)
-  const body = await request<GradingListResponse>(
-    `/grading-records?year=${year}&month=${month}&day=${day}`,
-  )
-  return body.gradingRecords.map((item) => ({
-    id: String(item.gradingRecordId),
-    title: item.worksheetTitle,
-    range: `p.${item.pageStart} ~ p.${item.pageEnd}`,
-    date,
-  }))
+  const body = await request<GradingListResponse>('/grading-records')
+  return body.gradingRecords
+    .map((item) => ({
+      id: String(item.gradingRecordId),
+      title: item.worksheetTitle,
+      date: toIsoDate(item.createdAt),
+    }))
+    .filter((item) => item.date === date)
 }
 
 // createdAt이 ISO("2026-08-24…")든 명세 예시의 한국어("2026년 8월 24일")든 YYYY-MM-DD로 정규화
@@ -143,7 +140,7 @@ interface GradingDetailResponse {
   correctCount: number
   totalCount: number
   score: number
-  wrongAnswers: { questionNumber: number; correctAnswer: string; studentAnswer: string }[]
+  wrongAnswers: { questionNumber: string; studentAnswer: string }[]
 }
 
 export async function getGrading(id: string): Promise<GradingRecord> {

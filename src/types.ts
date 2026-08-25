@@ -15,7 +15,7 @@ export interface GradingSetup {
 
 export interface WrongAnswer {
   page?: number // 실서버 상세 응답에는 페이지 정보가 없음
-  number: number
+  number: number | string // 서버는 questionNumber를 문자열로 준다 (예: "3")
 }
 
 // 목록 조회 응답에는 점수·오답 정보가 없어 카드 표시용 요약만 둔다

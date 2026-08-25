@@ -84,7 +84,7 @@ export default function ResultListScreen() {
               >
                 <div>
                   <p className="text-lg font-bold text-gray-800">{record.title}</p>
-                  <p className="font-bold text-gray-800">{record.range}</p>
+                  {record.range && <p className="font-bold text-gray-800">{record.range}</p>}
                   <p className="mt-2 text-xs text-gray-600">{record.date.replaceAll('-', '.')}</p>
                 </div>
                 <span className="text-xl text-gray-800">›</span>
