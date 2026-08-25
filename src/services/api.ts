@@ -1,11 +1,12 @@
-import { findRecord, gradeAndSave, loadRecords } from '@/services/records'
+import { findRecord, gradeAndSave, loadRecords, loadUser } from '@/services/records'
 import type { ExamType, GradingRecord, GradingSetup, GradingSummary } from '@/types'
 
 // Notion API 명세서 기준 (Base URL 예: https://34.50.17.22.nip.io/api)
 // VITE_API_BASE_URL이 없으면 목(localStorage)으로 동작한다.
 const BASE = import.meta.env.VITE_API_BASE_URL as string | undefined
-// ponytail: 학생 로그인/조회 API 미작성 — env 고정값으로 임시 처리. 로그인 붙으면 교체.
-const STUDENT_ID = (import.meta.env.VITE_STUDENT_ID as string | undefined) ?? '1'
+// ponytail: 학생 로그인 API 전 임시 — 가입 화면에서 입력한 학생 ID 사용, 없으면 env → '1'
+const studentIdHeader = () =>
+  loadUser()?.studentId ?? (import.meta.env.VITE_STUDENT_ID as string | undefined) ?? '1'
 
 const SOURCE_BY_EXAM_TYPE: Record<ExamType, string> = { 시험지: 'INHOUSE', '외부 교재': 'EXTERNAL' }
 
@@ -21,7 +22,7 @@ const lastImageBySession = new Map<string, { seq: number; gradingImageId: number
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {
     ...init,
-    headers: { studentId: STUDENT_ID, ...init?.headers },
+    headers: { studentId: studentIdHeader(), ...init?.headers },
   })
   if (!res.ok) throw new Error(`요청 실패 (${res.status})`)
   const text = await res.text()

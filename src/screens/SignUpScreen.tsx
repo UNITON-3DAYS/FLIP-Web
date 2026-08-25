@@ -32,12 +32,14 @@ export default function SignUpScreen() {
   const [name, setName] = useState('')
   const [school, setSchool] = useState('')
   const [grade, setGrade] = useState('')
-  const [password, setPassword] = useState('')
+  const [studentId, setStudentId] = useState('')
 
-  const canSubmit = [name.trim(), school, grade, password.trim()].every((v) => v !== '')
+  const canSubmit =
+    [name.trim(), school, grade].every((v) => v !== '') && /^\d+$/.test(studentId.trim())
 
   const submit = () => {
-    saveUser({ name: name.trim(), school, grade }) // 프로토: 비밀번호는 저장하지 않음
+    // 로그인 API 전 임시: 서버 학생 ID를 직접 입력받아 저장 (API 헤더에 사용)
+    saveUser({ name: name.trim(), school, grade, studentId: studentId.trim() })
     navigate('/home', { replace: true })
   }
 
@@ -78,15 +80,19 @@ export default function SignUpScreen() {
         </div>
 
         <label className={fieldClass}>
-          <span className={labelClass}>비밀번호</span>
+          <span className={labelClass}>학생 ID</span>
           <input
             className={controlClass}
-            type="password"
-            value={password}
-            placeholder="비밀번호 입력"
-            onChange={(e) => setPassword(e.target.value)}
+            inputMode="numeric"
+            value={studentId}
+            placeholder="학생 ID 입력 (예: 1)"
+            onChange={(e) => setStudentId(e.target.value)}
           />
-          <ClearButton show={password !== ''} onClear={() => setPassword('')} label="비밀번호 지우기" />
+          <ClearButton
+            show={studentId !== ''}
+            onClear={() => setStudentId('')}
+            label="학생 ID 지우기"
+          />
         </label>
       </div>
 

@@ -4,6 +4,7 @@ export interface User {
   name: string
   school: string
   grade: string
+  studentId: string // 서버 학생 ID (로그인 API 전 임시: 가입 화면에서 직접 입력)
 }
 
 export interface GradingSetup {
