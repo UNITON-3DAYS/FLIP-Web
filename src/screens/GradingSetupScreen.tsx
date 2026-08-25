@@ -7,20 +7,34 @@ import iconExamActive from '@/assets/icon-exam-active.svg'
 import iconExam from '@/assets/icon-exam.svg'
 import DropdownField from '@/components/DropdownField'
 import Logo from '@/components/Logo'
+import { useAsync } from '@/hooks/useAsync'
+import { SOURCE_BY_EXAM_TYPE, getWorksheets } from '@/services/api'
 import type { ExamType, GradingSetup } from '@/types'
 
 const EXAM_TYPES: { type: ExamType; icon: string; activeIcon: string }[] = [
   { type: '시험지', icon: iconExam, activeIcon: iconExamActive },
   { type: '외부 교재', icon: iconBook, activeIcon: iconBookActive },
 ]
-// 디자인: 타이틀은 목록에서 선택 (자유 입력 없음)
-const TITLES = ['쎈 2-1', '개념원리 2-1', 'RPM 2-1', '일품 2-1', '중간 대비 모의']
 
 export default function GradingSetupScreen() {
   const navigate = useNavigate()
   // 디자인(문제유형입력1): 초기에는 아무 유형도 선택되지 않은 상태
   const [examType, setExamType] = useState<ExamType | null>(null)
   const [title, setTitle] = useState('')
+  const [retry, setRetry] = useState(0)
+  const { data: worksheets, loading, error } = useAsync(getWorksheets, [retry])
+
+  // 선택한 유형의 문제지만 타이틀 후보로 보여준다 (유형 미선택 시 전체)
+  const titles = (worksheets ?? [])
+    .filter((sheet) => examType === null || sheet.source === SOURCE_BY_EXAM_TYPE[examType])
+    .map((sheet) => sheet.title)
+
+  const selectExamType = (type: ExamType) => {
+    setExamType(type)
+    // 바뀐 유형의 목록에 없는 타이틀은 초기화
+    const next = (worksheets ?? []).filter((sheet) => sheet.source === SOURCE_BY_EXAM_TYPE[type])
+    if (!next.some((sheet) => sheet.title === title)) setTitle('')
+  }
 
   const canSubmit = examType !== null && title !== ''
 
@@ -45,7 +59,7 @@ export default function GradingSetupScreen() {
             <button
               key={type}
               type="button"
-              onClick={() => setExamType(type)}
+              onClick={() => selectExamType(type)}
               className={`flex h-[117px] flex-col items-center justify-center gap-3 rounded-xl border-[3px] ${
                 active ? 'border-primary-300 bg-primary-50' : 'border-transparent bg-gray-200'
               }`}
@@ -64,11 +78,25 @@ export default function GradingSetupScreen() {
       <div className="relative -mx-1 mt-[26px]">
         <DropdownField
           label="타이틀"
-          placeholder="타이틀 선택"
+          placeholder={loading ? '불러오는 중...' : '타이틀 선택'}
           value={title}
-          options={TITLES}
+          options={titles}
           onChange={setTitle}
         />
+        {error ? (
+          <p className="mt-2 px-1 text-sm text-gray-600">
+            문제지 목록을 불러오지 못했어요.{' '}
+            <button
+              type="button"
+              onClick={() => setRetry((count) => count + 1)}
+              className="font-semibold text-primary-300"
+            >
+              다시 시도
+            </button>
+          </p>
+        ) : !loading && titles.length === 0 ? (
+          <p className="mt-2 px-1 text-sm text-gray-600">선택할 수 있는 문제지가 없어요.</p>
+        ) : null}
       </div>
 
       <button

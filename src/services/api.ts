@@ -1,5 +1,5 @@
 import { findRecord, gradeAndSave, loadRecords, loadUser } from '@/services/records'
-import type { ExamType, GradingRecord, GradingSetup, GradingSummary } from '@/types'
+import type { ExamType, GradingRecord, GradingSetup, GradingSummary, Worksheet } from '@/types'
 
 // Notion API 명세서 기준 (Base URL 예: https://34.50.17.22.nip.io/api)
 // VITE_API_BASE_URL이 없으면 목(localStorage)으로 동작한다.
@@ -8,7 +8,26 @@ const BASE = import.meta.env.VITE_API_BASE_URL as string | undefined
 const studentIdHeader = () =>
   loadUser()?.studentId ?? (import.meta.env.VITE_STUDENT_ID as string | undefined) ?? '1'
 
-const SOURCE_BY_EXAM_TYPE: Record<ExamType, string> = { 시험지: 'INHOUSE', '외부 교재': 'EXTERNAL' }
+export const SOURCE_BY_EXAM_TYPE: Record<ExamType, Worksheet['source']> = {
+  시험지: 'INHOUSE',
+  '외부 교재': 'EXTERNAL',
+}
+
+// 목 모드용 문제지 목록 (서버 시드와 무관, 데모용)
+const MOCK_WORKSHEETS: Worksheet[] = [
+  { worksheetId: 1, source: 'INHOUSE', title: '중간 대비 모의' },
+  { worksheetId: 2, source: 'INHOUSE', title: '쪽지시험 3회' },
+  { worksheetId: 3, source: 'EXTERNAL', title: '쎈 2-1' },
+  { worksheetId: 4, source: 'EXTERNAL', title: '개념원리 2-1' },
+  { worksheetId: 5, source: 'EXTERNAL', title: 'RPM 2-1' },
+  { worksheetId: 6, source: 'EXTERNAL', title: '일품 2-1' },
+]
+
+export async function getWorksheets(): Promise<Worksheet[]> {
+  if (!BASE) return MOCK_WORKSHEETS
+  const body = await request<{ worksheets: Worksheet[] }>('/worksheets')
+  return body.worksheets
+}
 
 const POLL_INTERVAL_MS = 2500
 const POLL_TIMEOUT_MS = 30_000 // 마지막 장 기준 채점 ~10초 + 여유 (팀 결정 2026-08-25)

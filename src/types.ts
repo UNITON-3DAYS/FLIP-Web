@@ -13,6 +13,13 @@ export interface GradingSetup {
   bookName?: string
 }
 
+// GET /worksheets 응답 항목
+export interface Worksheet {
+  worksheetId: number
+  source: 'INHOUSE' | 'EXTERNAL'
+  title: string
+}
+
 export interface WrongAnswer {
   page?: number // 실서버 상세 응답에는 페이지 정보가 없음
   number: number | string // 서버는 questionNumber를 문자열로 준다 (예: "3")
