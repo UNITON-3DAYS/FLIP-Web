@@ -48,10 +48,10 @@ export default function ResultDetailScreen() {
         <img src={iconBack} alt="" className="h-4" />
       </button>
 
-      <p className="mt-8 text-lg text-gray-700">{formatKoreanDate(record.date)}</p>
+      <p className="mt-10 text-lg text-gray-700">{formatKoreanDate(record.date)}</p>
       <h1 className="mt-1 text-2xl font-bold text-gray-900">{record.title}</h1>
 
-      <div className="mt-6">
+      <div className="mt-1">
         <ScoreDonut
           score={record.score}
           correctCount={record.correctCount}
@@ -59,13 +59,13 @@ export default function ResultDetailScreen() {
         />
       </div>
 
-      <h2 className="mt-8 text-lg font-bold text-gray-900">
+      <h2 className="mt-5 text-lg font-bold text-gray-900">
         오답 <span className="text-secondary">{record.wrongAnswers.length}</span>
       </h2>
       {record.wrongAnswers.length === 0 ? (
         <p className="mt-4 text-sm text-gray-600">오답이 없어요. 완벽해요!</p>
       ) : (
-        <div className="mt-3 overflow-hidden rounded-xl border border-gray-300 bg-white">
+        <div className="mt-2 overflow-hidden rounded-xl border border-gray-300 bg-white">
           <table className="w-full text-center">
             <thead>
               <tr className="border-b border-gray-300 bg-gray-100 text-gray-800">

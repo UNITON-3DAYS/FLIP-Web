@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 
+import iconClose from '@/assets/icon-close.svg'
 import GradingWaiting from '@/components/GradingWaiting'
 import { completeSession, createSession, uploadPage } from '@/services/api'
 import type { GradingSetup } from '@/types'
@@ -208,22 +209,27 @@ export default function CameraScreen() {
     <main className="relative mx-auto flex h-dvh w-full max-w-md flex-col bg-black">
       <div className="relative flex-1 overflow-hidden">
         <video ref={videoRef} autoPlay playsInline muted className="size-full object-cover" />
-        {/* 촬영 가이드 브래킷 */}
-        <div className="pointer-events-none absolute inset-x-9 inset-y-14">
-          <div className="absolute top-0 left-0 h-12 w-18 rounded-tl-xl border-t-8 border-l-8 border-primary-300" />
-          <div className="absolute top-0 right-0 h-12 w-18 rounded-tr-xl border-t-8 border-r-8 border-primary-300" />
-          <div className="absolute bottom-0 left-0 h-12 w-18 rounded-bl-xl border-b-8 border-l-8 border-primary-300" />
-          <div className="absolute right-0 bottom-0 h-12 w-18 rounded-br-xl border-r-8 border-b-8 border-primary-300" />
+        {/* 촬영 가이드 브래킷 (카메라.svg 실측: 40×30, 두께 6, x35) */}
+        <div className="pointer-events-none absolute right-[35px] left-[35px] top-[calc(env(safe-area-inset-top)+65px)] bottom-[43px]">
+          <div className="absolute top-0 left-0 h-[30px] w-10 rounded-tl-lg border-t-[6px] border-l-[6px] border-primary-300" />
+          <div className="absolute top-0 right-0 h-[30px] w-10 rounded-tr-lg border-t-[6px] border-r-[6px] border-primary-300" />
+          <div className="absolute bottom-0 left-0 h-[30px] w-10 rounded-bl-lg border-b-[6px] border-l-[6px] border-primary-300" />
+          <div className="absolute right-0 bottom-0 h-[30px] w-10 rounded-br-lg border-r-[6px] border-b-[6px] border-primary-300" />
         </div>
         <button
           type="button"
           onClick={requestExit}
           aria-label="닫기"
-          className="absolute top-[calc(env(safe-area-inset-top)+16px)] right-4 text-2xl text-white"
+          className="absolute top-[calc(env(safe-area-inset-top)+20px)] right-[25px]"
         >
-          ✕
+          <img src={iconClose} alt="" className="size-[15px]" />
         </button>
         {flash && <div className="pointer-events-none absolute inset-0 bg-white/70" />}
+        {!running && !submitting && (
+          <p className="pointer-events-none absolute bottom-2 left-1/2 w-full -translate-x-1/2 text-center text-xs text-white/70">
+            버저가 울릴 때마다 자동 촬영됩니다. 소리에 맞춰 페이지를 넘겨주세요.
+          </p>
+        )}
 
         {running && (
           <div className="absolute top-[calc(env(safe-area-inset-top)+40px)] left-1/2 -translate-x-1/2 rounded-full bg-black/60 px-5 py-2 text-center text-white">
@@ -255,9 +261,6 @@ export default function CameraScreen() {
             <span className="block size-full rounded-full bg-white" />
           </button>
         )}
-        <p className="text-center text-xs text-gray-700">
-          버저가 울릴 때마다 자동 촬영됩니다. 소리에 맞춰 페이지를 넘겨주세요.
-        </p>
       </div>
 
       {submitting && <GradingWaiting />}
