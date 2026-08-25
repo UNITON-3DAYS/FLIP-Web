@@ -1,5 +1,12 @@
 import { findRecord, gradeAndSave, loadRecords, loadUser } from '@/services/records'
-import type { ExamType, GradingRecord, GradingSetup, GradingSummary, Worksheet } from '@/types'
+import type {
+  ExamType,
+  GradingRecord,
+  GradingSetup,
+  GradingSummary,
+  School,
+  Worksheet,
+} from '@/types'
 
 // Notion API 명세서 기준 (Base URL 예: https://34.50.17.22.nip.io/api)
 // VITE_API_BASE_URL이 없으면 목(localStorage)으로 동작한다.
@@ -27,6 +34,20 @@ export async function getWorksheets(): Promise<Worksheet[]> {
   if (!BASE) return MOCK_WORKSHEETS
   const body = await request<{ worksheets: Worksheet[] }>('/worksheets')
   return body.worksheets
+}
+
+// 목 모드용 학교 목록
+const MOCK_SCHOOLS: School[] = [
+  { schoolId: 1, name: '서울중학교' },
+  { schoolId: 2, name: '한국중학교' },
+  { schoolId: 3, name: '미래고등학교' },
+  { schoolId: 4, name: '기타' },
+]
+
+export async function getSchools(): Promise<School[]> {
+  if (!BASE) return MOCK_SCHOOLS
+  const body = await request<{ schools: School[] }>('/schools')
+  return body.schools
 }
 
 const POLL_INTERVAL_MS = 2500

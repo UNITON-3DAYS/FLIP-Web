@@ -13,6 +13,12 @@ export interface GradingSetup {
   bookName?: string
 }
 
+// GET /schools 응답 항목
+export interface School {
+  schoolId: number
+  name: string
+}
+
 // GET /worksheets 응답 항목
 export interface Worksheet {
   worksheetId: number

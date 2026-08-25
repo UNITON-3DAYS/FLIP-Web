@@ -4,9 +4,10 @@ import { useNavigate } from 'react-router-dom'
 import iconClear from '@/assets/icon-clear.svg'
 import DropdownField from '@/components/DropdownField'
 import Logo from '@/components/Logo'
+import { useAsync } from '@/hooks/useAsync'
+import { getSchools } from '@/services/api'
 import { saveUser } from '@/services/records'
 
-const SCHOOLS = ['서울중학교', '한국중학교', '미래고등학교', '기타']
 const GRADES = ['1학년', '2학년', '3학년']
 
 const fieldClass = 'relative flex flex-col gap-1 rounded-xl bg-gray-200 px-5 py-[18px]'
@@ -33,6 +34,12 @@ export default function SignUpScreen() {
   const [school, setSchool] = useState('')
   const [grade, setGrade] = useState('')
   const [studentId, setStudentId] = useState('')
+  const [retry, setRetry] = useState(0)
+  const { data: schools, loading: schoolsLoading, error: schoolsError } = useAsync(
+    getSchools,
+    [retry],
+  )
+  const schoolNames = (schools ?? []).map((item) => item.name)
 
   const canSubmit =
     [name.trim(), school, grade].every((v) => v !== '') && /^\d+$/.test(studentId.trim())
@@ -62,21 +69,37 @@ export default function SignUpScreen() {
           <ClearButton show={name !== ''} onClear={() => setName('')} label="이름 지우기" />
         </label>
 
-        <div className="grid grid-cols-2 gap-3">
-          <DropdownField
-            label="학교"
-            placeholder="학교 선택"
-            value={school}
-            options={SCHOOLS}
-            onChange={setSchool}
-          />
-          <DropdownField
-            label="학년"
-            placeholder="학년 선택"
-            value={grade}
-            options={GRADES}
-            onChange={setGrade}
-          />
+        <div>
+          <div className="grid grid-cols-2 gap-3">
+            <DropdownField
+              label="학교"
+              placeholder={schoolsLoading ? '불러오는 중...' : '학교 선택'}
+              value={school}
+              options={schoolNames}
+              onChange={setSchool}
+            />
+            <DropdownField
+              label="학년"
+              placeholder="학년 선택"
+              value={grade}
+              options={GRADES}
+              onChange={setGrade}
+            />
+          </div>
+          {schoolsError ? (
+            <p className="mt-2 px-1 text-sm text-gray-600">
+              학교 목록을 불러오지 못했어요.{' '}
+              <button
+                type="button"
+                onClick={() => setRetry((count) => count + 1)}
+                className="font-semibold text-primary-300"
+              >
+                다시 시도
+              </button>
+            </p>
+          ) : !schoolsLoading && schoolNames.length === 0 ? (
+            <p className="mt-2 px-1 text-sm text-gray-600">선택할 수 있는 학교가 없어요.</p>
+          ) : null}
         </div>
 
         <label className={fieldClass}>
