@@ -3,6 +3,7 @@ import type { FormEvent } from 'react'
 
 import Dropdown from '@/components/Dropdown'
 import ViewChip from '@/components/ViewChip'
+import type { DeskStudent } from '@/desk/mock'
 import { SCHOOLS, STUDENTS } from '@/desk/mock'
 
 const GRADES = ['1학년', '2학년', '3학년'] as const
@@ -10,9 +11,11 @@ const GRADES = ['1학년', '2학년', '3학년'] as const
 function StudentRosterPage() {
   const [students, setStudents] = useState(STUDENTS)
   const dialogRef = useRef<HTMLDialogElement>(null)
+  const deleteDialogRef = useRef<HTMLDialogElement>(null)
   const [name, setName] = useState('')
   const [school, setSchool] = useState('')
   const [grade, setGrade] = useState<string>(GRADES[0])
+  const [deleteTarget, setDeleteTarget] = useState<DeskStudent | null>(null)
 
   const addStudent = (e: FormEvent) => {
     e.preventDefault()
@@ -23,8 +26,14 @@ function StudentRosterPage() {
     dialogRef.current?.close()
   }
 
-  const removeStudent = (id: string) => {
-    setStudents(students.filter((student) => student.id !== id))
+  const askRemove = (student: DeskStudent) => {
+    setDeleteTarget(student)
+    deleteDialogRef.current?.showModal()
+  }
+
+  const confirmRemove = () => {
+    if (deleteTarget) setStudents(students.filter((student) => student.id !== deleteTarget.id))
+    deleteDialogRef.current?.close()
   }
 
   return (
@@ -68,7 +77,7 @@ function StudentRosterPage() {
                     <ViewChip to={`/students/${student.id}`} />
                     <button
                       type="button"
-                      onClick={() => removeStudent(student.id)}
+                      onClick={() => askRemove(student)}
                       aria-label={`${student.name} 삭제`}
                       className="text-gray-600 hover:text-secondary"
                     >
@@ -121,6 +130,34 @@ function StudentRosterPage() {
             </button>
           </div>
         </form>
+      </dialog>
+
+      <dialog
+        ref={deleteDialogRef}
+        className="m-auto w-80 rounded-[10px] bg-white p-6 backdrop:bg-black/40"
+      >
+        <h2 className="text-lg font-bold text-gray-900">학생 삭제</h2>
+        <p className="mt-3 text-sm text-gray-700">
+          <span className="font-bold">{deleteTarget?.name}</span> 학생을 삭제할까요?
+          <br />
+          채점 기록도 함께 사라집니다.
+        </p>
+        <div className="mt-5 flex gap-2">
+          <button
+            type="button"
+            onClick={() => deleteDialogRef.current?.close()}
+            className="flex-1 rounded-full bg-gray-200 py-2 text-sm font-bold text-gray-700"
+          >
+            취소
+          </button>
+          <button
+            type="button"
+            onClick={confirmRemove}
+            className="flex-1 rounded-full bg-secondary py-2 text-sm font-bold text-white"
+          >
+            삭제
+          </button>
+        </div>
       </dialog>
     </section>
   )
