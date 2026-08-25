@@ -67,6 +67,7 @@ function GradingResultPage() {
               score={grading.score}
               correctCount={grading.correctCount}
               totalCount={grading.totalCount}
+              fractionOnly={grading.examType === '외부 교재'}
             />
           </div>
         </div>

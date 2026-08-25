@@ -100,7 +100,11 @@ export default function ParentReportScreen() {
                     {grading.wrongAnswers.length}개
                   </p>
                 </div>
-                <span className="text-lg font-semibold text-primary-300">{grading.score}점</span>
+                <span className="text-lg font-semibold text-primary-300">
+                  {grading.examType === '외부 교재'
+                    ? `${grading.correctCount}/${grading.totalCount}`
+                    : `${grading.score}점`}
+                </span>
               </div>
               {comment !== '' && (
                 <div className="mt-3 rounded-[10px] bg-primary-50 p-3">

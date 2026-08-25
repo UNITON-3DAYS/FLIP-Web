@@ -138,7 +138,11 @@ function StudentDetailPage() {
                   <td className="px-6 py-4 text-gray-700">{grading.date.replaceAll('-', '.')}</td>
                   <td className="px-6 py-4 text-gray-700">{grading.examType}</td>
                   <td className="px-6 py-4 font-bold text-gray-800">{grading.title}</td>
-                  <td className="px-6 py-4 font-bold text-primary-400">{grading.score}점</td>
+                  <td className="px-6 py-4 font-bold text-primary-400">
+                    {grading.examType === '외부 교재'
+                      ? `${grading.correctCount}/${grading.totalCount}`
+                      : `${grading.score}점`}
+                  </td>
                   <td className="px-6 py-4 text-right">
                     <ViewChip to={`/grading/${grading.id}`} />
                   </td>
