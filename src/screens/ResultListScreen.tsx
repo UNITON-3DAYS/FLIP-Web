@@ -8,16 +8,18 @@ export default function ResultListScreen() {
   const { data: records, loading, error } = useAsync(getGradings, [])
 
   return (
-    <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-white px-6 pt-12 pb-8">
-      <button
-        type="button"
-        onClick={() => navigate('/home')}
-        className="self-start text-xl text-gray-700"
-        aria-label="뒤로"
-      >
-        &lt;
-      </button>
-      <h1 className="mt-4 text-2xl font-bold">채점 내역</h1>
+    <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-gray-100 px-6 pt-12 pb-8">
+      <div className="relative flex items-center justify-center">
+        <button
+          type="button"
+          onClick={() => navigate('/home')}
+          className="absolute left-0 text-xl text-gray-700"
+          aria-label="뒤로"
+        >
+          &lt;
+        </button>
+        <h1 className="text-lg font-bold">채점 내역</h1>
+      </div>
 
       {loading ? (
         <p className="mt-20 text-center text-sm text-gray-600">불러오는 중...</p>
@@ -38,15 +40,14 @@ export default function ResultListScreen() {
             <li key={record.id}>
               <Link
                 to={`/results/${record.id}`}
-                className="flex items-center justify-between rounded-xl bg-gray-200 px-5 py-4"
+                className="flex items-center justify-between rounded-[10px] bg-white px-5 py-4 shadow-sm"
               >
                 <div>
-                  <p className="font-bold">{record.title}</p>
-                  <p className="mt-1 text-xs text-gray-700">
-                    {record.range} · {record.date.replaceAll('-', '.')}
-                  </p>
+                  <p className="text-lg font-bold">{record.title}</p>
+                  <p className="mt-0.5 text-sm text-gray-800">{record.range}</p>
+                  <p className="mt-1 text-xs text-gray-600">{record.date.replaceAll('-', '.')}</p>
                 </div>
-                <span className="text-lg font-black text-gray-1000">{record.score}점</span>
+                <span className="text-lg text-gray-500">›</span>
               </Link>
             </li>
           ))}

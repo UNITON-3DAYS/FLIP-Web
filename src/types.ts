@@ -2,6 +2,7 @@ export type ExamType = '시험지' | '외부 교재'
 
 export interface User {
   name: string
+  school: string
   grade: string
 }
 

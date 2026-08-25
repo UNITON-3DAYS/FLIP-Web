@@ -1,33 +1,25 @@
 import { Link } from 'react-router-dom'
 
-import { loadUser } from '@/services/records'
+import Logo from '@/components/Logo'
 
 export default function HomeScreen() {
-  const user = loadUser()
-
   return (
-    <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-white px-6 pt-16">
-      <div className="flex size-12 items-center justify-center rounded-full bg-gray-1000 text-xl font-black text-white">
-        이
-      </div>
-      <h1 className="mt-6 text-2xl font-bold">
-        {user ? `${user.name}님,` : '안녕하세요,'}
-        <br />
-        오늘도 채점은 채킷이 할게요
-      </h1>
+    <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-gray-100 px-6 pt-14 pb-8">
+      <Logo />
 
-      <div className="mt-12 flex flex-col gap-4">
-        <Link
-          to="/grading/setup"
-          className="rounded-2xl bg-gray-1000 px-6 py-8 text-center text-lg font-bold text-white"
-        >
-          채점하기
+      {/* 배너 자리 (디자인 미정 영역) */}
+      <div className="mt-6 h-36 rounded-[10px] bg-gray-400" />
+
+      <div className="mt-6 grid grid-cols-2 gap-3">
+        <Link to="/grading/setup" className="flex flex-col rounded-[10px] bg-white p-4 shadow-sm">
+          <p className="font-bold">채점하기</p>
+          <p className="mt-0.5 text-xs text-gray-600">카메라로 채점하기</p>
+          <span className="mt-4 mb-2 self-center text-5xl">📝</span>
         </Link>
-        <Link
-          to="/results"
-          className="rounded-2xl bg-gray-200 px-6 py-8 text-center text-lg font-bold text-gray-800"
-        >
-          채점 내역
+        <Link to="/results" className="flex flex-col rounded-[10px] bg-white p-4 shadow-sm">
+          <p className="font-bold">채점내역</p>
+          <p className="mt-0.5 text-xs text-gray-600">채점한 내역 모음</p>
+          <span className="mt-4 mb-2 self-center text-5xl">🗂️</span>
         </Link>
       </div>
     </main>

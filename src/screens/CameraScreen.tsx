@@ -162,7 +162,7 @@ export default function CameraScreen() {
 
   if (cameraError) {
     return (
-      <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col items-center justify-center bg-gray-1000 px-6 text-center text-white">
+      <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col items-center justify-center bg-black px-6 text-center text-white">
         <p className="text-lg font-bold">카메라를 열 수 없어요</p>
         <p className="mt-2 text-sm text-gray-600">
           브라우저 설정에서 카메라 권한을 허용한 뒤 다시 시도해주세요.
@@ -170,7 +170,7 @@ export default function CameraScreen() {
         <button
           type="button"
           onClick={() => navigate(-1)}
-          className="mt-8 rounded-xl bg-white px-8 py-3 font-bold text-gray-1000"
+          className="mt-8 rounded-xl bg-primary-300 px-8 py-3 font-bold text-white"
         >
           돌아가기
         </button>
@@ -180,16 +180,29 @@ export default function CameraScreen() {
 
   return (
     // h-dvh 고정: min-h면 video의 h-full(퍼센트 높이)이 무시된다
-    <main className="relative mx-auto flex h-dvh w-full max-w-md flex-col bg-gray-1000">
+    <main className="relative mx-auto flex h-dvh w-full max-w-md flex-col bg-black">
       <div className="relative flex-1 overflow-hidden">
         <video ref={videoRef} autoPlay playsInline muted className="size-full object-cover" />
-        {/* 촬영 가이드 프레임 */}
-        <div className="pointer-events-none absolute inset-6 rounded-2xl border-2 border-white/60" />
+        {/* 촬영 가이드 브래킷 */}
+        <div className="pointer-events-none absolute inset-8">
+          <div className="absolute top-0 left-0 size-10 rounded-tl border-t-4 border-l-4 border-primary-300" />
+          <div className="absolute top-0 right-0 size-10 rounded-tr border-t-4 border-r-4 border-primary-300" />
+          <div className="absolute bottom-0 left-0 size-10 rounded-bl border-b-4 border-l-4 border-primary-300" />
+          <div className="absolute right-0 bottom-0 size-10 rounded-br border-r-4 border-b-4 border-primary-300" />
+        </div>
+        <button
+          type="button"
+          onClick={() => navigate(-1)}
+          aria-label="닫기"
+          className="absolute top-4 right-4 text-2xl text-white"
+        >
+          ✕
+        </button>
         {flash && <div className="pointer-events-none absolute inset-0 bg-white/70" />}
 
         {running && (
           <div className="absolute top-10 left-1/2 -translate-x-1/2 rounded-full bg-black/60 px-5 py-2 text-center text-white">
-            <span className="text-2xl font-black text-white">{countdown}</span>
+            <span className="text-2xl font-black text-primary-300">{countdown}</span>
             <span className="ml-2 text-sm">초 후 촬영 · {shotCount}장 완료</span>
           </div>
         )}
@@ -205,7 +218,7 @@ export default function CameraScreen() {
                 type="button"
                 onClick={() => setIntervalSec(sec)}
                 className={`rounded-full px-4 py-1.5 text-sm font-bold ${
-                  intervalSec === sec ? 'bg-white text-gray-1000' : 'bg-gray-800 text-gray-500'
+                  intervalSec === sec ? 'bg-primary-300 text-white' : 'bg-gray-800 text-gray-500'
                 }`}
               >
                 {sec}초
@@ -220,7 +233,7 @@ export default function CameraScreen() {
             type="button"
             disabled={shotCount === 0 || submitting}
             onClick={() => void finish()}
-            className="rounded-xl bg-white py-4 text-base font-bold text-gray-1000 disabled:bg-gray-800 disabled:text-gray-600"
+            className="rounded-xl bg-primary-300 py-4 text-base font-bold text-white disabled:bg-gray-800 disabled:text-gray-600"
           >
             {submitting ? '채점 중...' : '촬영 종료 · 채점하기'}
           </button>
@@ -228,7 +241,7 @@ export default function CameraScreen() {
           <button
             type="button"
             onClick={() => void start()}
-            className="rounded-xl bg-white py-4 text-base font-bold text-gray-1000"
+            className="rounded-xl bg-primary-300 py-4 text-base font-bold text-white"
           >
             촬영 시작
           </button>

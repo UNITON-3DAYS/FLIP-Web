@@ -1,7 +1,26 @@
 @import "tailwindcss";
 
-/* Figma $color.palette.gray-* 디자인 토큰 (와이어프레임 그레이스케일) */
+/* 로고 전용 폰트 (noonnu CDN, 실패 시 Pretendard 폴백) */
+@font-face {
+  font-family: 'Paperlogy';
+  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-9Black.woff2')
+    format('woff2');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Figma 디자인 시스템 토큰 (design.md) */
 @theme {
+  --font-sans: 'Pretendard Variable', Pretendard, -apple-system, 'Apple SD Gothic Neo', sans-serif;
+  --font-logo: 'Paperlogy', 'Pretendard Variable', Pretendard, sans-serif;
+
+  --color-primary-100: #dafffc;
+  --color-primary-200: #99ece7;
+  --color-primary-300: #27d8cc;
+  --color-primary-400: #24c8bd;
+  --color-secondary: #fe2e6b;
+
   --color-gray-00: #ffffff;
   --color-gray-100: #f7f8f9;
   --color-gray-200: #f3f4f5;
@@ -16,5 +35,5 @@
 }
 
 body {
-  background-color: var(--color-gray-200);
+  background-color: var(--color-gray-100);
 }

@@ -1,7 +1,11 @@
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
+import Logo from '@/components/Logo'
 import { loadUser } from '@/services/records'
+
+const glowClass =
+  'pointer-events-none absolute size-[430px] rounded-full bg-[radial-gradient(circle,rgba(153,236,231,0.54)_0%,rgba(255,255,255,0)_100%)]'
 
 export default function SplashScreen() {
   const navigate = useNavigate()
@@ -14,12 +18,13 @@ export default function SplashScreen() {
   }, [navigate])
 
   return (
-    <main className="flex min-h-dvh flex-col items-center justify-center bg-gray-1000">
-      <div className="flex size-24 items-center justify-center rounded-full bg-white text-4xl font-black text-gray-1000">
-        이
-      </div>
-      <h1 className="mt-6 text-3xl font-black text-white">채킷</h1>
-      <p className="mt-1 text-sm font-semibold tracking-widest text-gray-500">CHECKIT</p>
+    <main className="relative mx-auto flex min-h-dvh w-full max-w-md flex-col items-center justify-center overflow-hidden bg-white">
+      <div className={`${glowClass} top-[171px] -left-[90px]`} />
+      <div className={`${glowClass} top-[218px] left-[39px]`} />
+      <p className="relative">
+        <span className="mr-2 align-super text-xl text-primary-300">✦</span>
+        <Logo className="text-[50px]" />
+      </p>
     </main>
   )
 }
