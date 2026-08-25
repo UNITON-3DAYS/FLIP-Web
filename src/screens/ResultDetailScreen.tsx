@@ -13,7 +13,7 @@ export default function ResultDetailScreen() {
 
   if (loading) {
     return (
-      <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col items-center justify-center bg-gray-100 px-6 text-center">
+      <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col items-center justify-center bg-white px-6 text-center">
         <p className="text-sm text-gray-600">불러오는 중...</p>
       </main>
     )
@@ -21,7 +21,7 @@ export default function ResultDetailScreen() {
 
   if (error || !record) {
     return (
-      <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col items-center justify-center bg-gray-100 px-6 text-center">
+      <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col items-center justify-center bg-white px-6 text-center">
         <p className="text-sm text-gray-600">{error ?? '채점 결과를 찾을 수 없어요.'}</p>
         <Link to="/results" className="mt-4 font-bold text-primary-300">
           채점 내역으로
@@ -31,7 +31,7 @@ export default function ResultDetailScreen() {
   }
 
   return (
-    <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-gray-100 px-6 pt-12 pb-8">
+    <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-white px-6 pt-12 pb-8">
       <div className="relative flex items-center justify-center">
         <button
           type="button"
@@ -44,7 +44,7 @@ export default function ResultDetailScreen() {
         <h1 className="text-lg font-bold">채점 결과</h1>
       </div>
 
-      <div className="mt-6 rounded-[10px] bg-white p-5 shadow-sm">
+      <div className="mt-6 rounded-[10px] border border-gray-200 bg-white p-5 shadow-sm">
         <p className="text-lg font-bold">{record.title}</p>
         <p className="mt-1 text-xs text-gray-600">
           {record.examType}
@@ -63,7 +63,7 @@ export default function ResultDetailScreen() {
       {record.wrongAnswers.length === 0 ? (
         <p className="mt-4 text-sm text-gray-600">오답이 없어요. 완벽해요!</p>
       ) : (
-        <div className="mt-3 overflow-hidden rounded-[10px] bg-white shadow-sm">
+        <div className="mt-3 overflow-hidden rounded-[10px] border border-gray-200 bg-white shadow-sm">
           <table className="w-full text-center text-sm">
             <thead>
               <tr className="border-b border-gray-300 font-bold text-gray-700">

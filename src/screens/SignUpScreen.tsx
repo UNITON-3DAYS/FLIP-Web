@@ -7,9 +7,23 @@ import { saveUser } from '@/services/records'
 const SCHOOLS = ['서울중학교', '한국중학교', '미래고등학교', '기타']
 const GRADES = ['중1', '중2', '중3', '고1', '고2', '고3']
 
-const fieldClass = 'flex flex-col gap-1 rounded-[10px] bg-gray-100 px-4 py-3'
+const fieldClass = 'relative flex flex-col gap-1 rounded-[10px] bg-gray-100 px-4 py-3'
 const labelClass = 'text-xs font-medium text-gray-700'
 const controlClass = 'bg-transparent text-base outline-none placeholder:text-gray-600'
+
+function ClearButton({ show, onClear, label }: { show: boolean; onClear: () => void; label: string }) {
+  if (!show) return null
+  return (
+    <button
+      type="button"
+      onClick={onClear}
+      aria-label={label}
+      className="absolute top-1/2 right-4 flex size-5 -translate-y-1/2 items-center justify-center rounded-full bg-gray-500 text-[10px] text-white"
+    >
+      ✕
+    </button>
+  )
+}
 
 export default function SignUpScreen() {
   const navigate = useNavigate()
@@ -40,6 +54,7 @@ export default function SignUpScreen() {
             placeholder="이름 입력"
             onChange={(e) => setName(e.target.value)}
           />
+          <ClearButton show={name !== ''} onClear={() => setName('')} label="이름 지우기" />
         </label>
 
         <div className="grid grid-cols-2 gap-3">
@@ -88,6 +103,7 @@ export default function SignUpScreen() {
             placeholder="비밀번호 입력"
             onChange={(e) => setPassword(e.target.value)}
           />
+          <ClearButton show={password !== ''} onClear={() => setPassword('')} label="비밀번호 지우기" />
         </label>
       </div>
 

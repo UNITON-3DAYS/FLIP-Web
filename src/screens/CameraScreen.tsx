@@ -238,13 +238,13 @@ export default function CameraScreen() {
             {submitting ? '채점 중...' : '촬영 종료 · 채점하기'}
           </button>
         ) : (
+          // 디자인의 원형 셔터 버튼
           <button
             type="button"
             onClick={() => void start()}
-            className="rounded-xl bg-primary-300 py-4 text-base font-bold text-white"
-          >
-            촬영 시작
-          </button>
+            aria-label="촬영 시작"
+            className="size-16 self-center rounded-full bg-white outline-4 outline-offset-4 outline-primary-300"
+          />
         )}
         <p className="text-center text-xs text-gray-700">
           버저가 울릴 때마다 자동 촬영됩니다. 소리에 맞춰 페이지를 넘겨주세요.

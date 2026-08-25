@@ -8,7 +8,7 @@ export default function ResultListScreen() {
   const { data: records, loading, error } = useAsync(getGradings, [])
 
   return (
-    <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-gray-100 px-6 pt-12 pb-8">
+    <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-white px-6 pt-12 pb-8">
       <div className="relative flex items-center justify-center">
         <button
           type="button"
@@ -40,7 +40,7 @@ export default function ResultListScreen() {
             <li key={record.id}>
               <Link
                 to={`/results/${record.id}`}
-                className="flex items-center justify-between rounded-[10px] bg-white px-5 py-4 shadow-sm"
+                className="flex items-center justify-between rounded-[10px] border border-gray-200 bg-white px-5 py-4 shadow-sm"
               >
                 <div>
                   <p className="text-lg font-bold">{record.title}</p>
