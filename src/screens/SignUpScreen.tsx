@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { saveUser } from '@/services/records'
 
 const inputClass =
-  'w-full rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-base outline-none focus:border-yellow-400'
+  'w-full rounded-xl border border-gray-400 bg-gray-100 px-4 py-3 text-base outline-none focus:border-gray-800'
 
 export default function SignUpScreen() {
   const navigate = useNavigate()
@@ -24,11 +24,11 @@ export default function SignUpScreen() {
       <h1 className="text-2xl font-bold">회원 정보 입력</h1>
 
       <div className="mt-10 flex flex-col gap-6">
-        <label className="flex flex-col gap-2 text-sm font-semibold text-zinc-700">
+        <label className="flex flex-col gap-2 text-sm font-semibold text-gray-800">
           이름
           <input className={inputClass} value={name} onChange={(e) => setName(e.target.value)} />
         </label>
-        <label className="flex flex-col gap-2 text-sm font-semibold text-zinc-700">
+        <label className="flex flex-col gap-2 text-sm font-semibold text-gray-800">
           학년
           <input
             className={inputClass}
@@ -37,7 +37,7 @@ export default function SignUpScreen() {
             onChange={(e) => setGrade(e.target.value)}
           />
         </label>
-        <label className="flex flex-col gap-2 text-sm font-semibold text-zinc-700">
+        <label className="flex flex-col gap-2 text-sm font-semibold text-gray-800">
           비밀번호
           <input
             className={inputClass}
@@ -52,7 +52,7 @@ export default function SignUpScreen() {
         type="button"
         disabled={!canSubmit}
         onClick={submit}
-        className="mt-auto rounded-xl bg-yellow-400 py-4 text-base font-bold text-zinc-900 disabled:bg-zinc-200 disabled:text-zinc-400"
+        className="mt-auto rounded-xl bg-gray-1000 py-4 text-base font-bold text-white disabled:bg-gray-400 disabled:text-gray-600"
       >
         시작하기
       </button>

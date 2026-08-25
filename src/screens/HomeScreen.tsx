@@ -7,7 +7,7 @@ export default function HomeScreen() {
 
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-white px-6 pt-16">
-      <div className="flex size-12 items-center justify-center rounded-full bg-yellow-400 text-xl font-black">
+      <div className="flex size-12 items-center justify-center rounded-full bg-gray-1000 text-xl font-black text-white">
         이
       </div>
       <h1 className="mt-6 text-2xl font-bold">
@@ -19,13 +19,13 @@ export default function HomeScreen() {
       <div className="mt-12 flex flex-col gap-4">
         <Link
           to="/grading/setup"
-          className="rounded-2xl bg-yellow-400 px-6 py-8 text-center text-lg font-bold text-zinc-900"
+          className="rounded-2xl bg-gray-1000 px-6 py-8 text-center text-lg font-bold text-white"
         >
           채점하기
         </Link>
         <Link
           to="/results"
-          className="rounded-2xl bg-zinc-100 px-6 py-8 text-center text-lg font-bold text-zinc-700"
+          className="rounded-2xl bg-gray-200 px-6 py-8 text-center text-lg font-bold text-gray-800"
         >
           채점 내역
         </Link>

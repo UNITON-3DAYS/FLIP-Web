@@ -14,12 +14,12 @@ export default function SplashScreen() {
   }, [navigate])
 
   return (
-    <main className="flex min-h-dvh flex-col items-center justify-center bg-yellow-400">
-      <div className="flex size-24 items-center justify-center rounded-full bg-zinc-900 text-4xl font-black text-yellow-400">
+    <main className="flex min-h-dvh flex-col items-center justify-center bg-gray-1000">
+      <div className="flex size-24 items-center justify-center rounded-full bg-white text-4xl font-black text-gray-1000">
         이
       </div>
-      <h1 className="mt-6 text-3xl font-black text-zinc-900">채킷</h1>
-      <p className="mt-1 text-sm font-semibold tracking-widest text-zinc-800">CHECKIT</p>
+      <h1 className="mt-6 text-3xl font-black text-white">채킷</h1>
+      <p className="mt-1 text-sm font-semibold tracking-widest text-gray-500">CHECKIT</p>
     </main>
   )
 }

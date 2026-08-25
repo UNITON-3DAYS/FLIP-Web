@@ -1,5 +1,20 @@
 @import "tailwindcss";
 
+/* Figma $color.palette.gray-* 디자인 토큰 (와이어프레임 그레이스케일) */
+@theme {
+  --color-gray-00: #ffffff;
+  --color-gray-100: #f7f8f9;
+  --color-gray-200: #f3f4f5;
+  --color-gray-300: #eeeff1;
+  --color-gray-400: #dcdee3;
+  --color-gray-500: #d1d3d8;
+  --color-gray-600: #b0b3ba;
+  --color-gray-700: #868b94;
+  --color-gray-800: #555d6d;
+  --color-gray-900: #2a3038;
+  --color-gray-1000: #1a1c20;
+}
+
 body {
-  background-color: #f4f4f5;
+  background-color: var(--color-gray-200);
 }
