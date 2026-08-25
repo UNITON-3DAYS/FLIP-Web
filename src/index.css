@@ -39,3 +39,17 @@ body {
   background-color: var(--color-gray-100);
   accent-color: var(--color-primary-300); /* 네이티브 피커 틴트 (지원 브라우저 한정) */
 }
+
+/* 채점 대기 화면 돋보기 스캔 */
+@keyframes scan {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(-150px);
+  }
+}
+.animate-scan {
+  animation: scan 2.4s ease-in-out infinite;
+}

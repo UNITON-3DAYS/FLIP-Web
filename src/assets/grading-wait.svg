@@ -188,41 +188,6 @@
 </g>
 </g>
 </g>
-<g id="Clip_path_group_3" transform="translate(54 68.5)">
-<mask id="mask2_164_419" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="0" y="0" width="390" height="844">
-<g id="i10">
-<path id="Vector_11" d="M246.914 0H0V111.5H246.914V0Z" fill="white" />
-</g>
-</mask>
-<g mask="url(#mask2_164_419)">
-</g>
-<g id="Clip_path_group_4" transform="translate(54 68)">
-<mask id="mask3_164_419" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="0" y="0" width="390" height="844">
-<g id="i12">
-<path id="Vector_12" transform="translate(-60 -24.5)" d="M246.914 0H0V111.5H246.914V0Z" fill="white" />
-</g>
-</mask>
-<g mask="url(#mask3_164_419)">
-</g>
-<g id="i19" transform="translate(253.244 62.8149)">
-<g id="Frame_16" transform="translate(-264.244 -109.815)">
-<g id="Frame_17">
-<g id="Frame_18">
-<g id="i4">
-<path id="Vector_13" d="M22.1442 44.2883C34.3741 44.2883 44.2883 34.3741 44.2883 22.1442C44.2883 9.91428 34.3741 0 22.1442 0C9.91428 0 0 9.91428 0 22.1442C0 34.3741 9.91428 44.2883 22.1442 44.2883Z" fill="#FCFCFC" stroke="#2A3038" stroke-width="10.05" />
-</g>
-<g id="i5" transform="translate(36.0011 36.0011)">
-<path id="Vector_14" d="M0 0L13.8569 13.8589" stroke="#2A3038" stroke-width="10.05" />
-</g>
-<g id="i6" transform="translate(40.8907 40.8336)">
-<path id="Vector_15" d="M8.34225 1.16128C9.90804 -0.388431 12.4306 -0.386423 13.9964 1.16329L28.583 15.6051C30.1709 17.179 30.1708 19.7457 28.5809 21.3196L21.4314 28.3887C19.8656 29.9384 17.343 29.9384 15.7772 28.3887L1.19067 13.9449C-0.397226 12.371 -0.397227 9.80428 1.19268 8.23045L8.34225 1.16128Z" fill="#2A3038" />
-</g>
-</g>
-</g>
-</g>
-</g>
-</g>
-</g>
 </g>
 </g>
 <defs>
