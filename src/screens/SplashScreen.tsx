@@ -2,14 +2,14 @@ import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import splash from '@/assets/splash.svg'
-import { loadUser } from '@/services/records'
 
 export default function SplashScreen() {
   const navigate = useNavigate()
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
-      navigate(loadUser() ? '/home' : '/signup', { replace: true })
+      // 테스트 단계: 세션 유지 없이 항상 로그인부터 (복원 시 loadUser() ? '/home' : '/signup')
+      navigate('/signup', { replace: true })
     }, 1200)
     return () => window.clearTimeout(timer)
   }, [navigate])
