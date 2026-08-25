@@ -7,6 +7,7 @@ import { completeSession, createSession, uploadPage } from '@/services/api'
 import type { GradingSetup } from '@/types'
 
 const INTERVAL_SEC = 3 // 촬영 주기 고정 (팀 결정 2026-08-25)
+const CAPTURE_MARGIN = 0.1 // 가이드 영역보다 10% 넓게 잘라 브래킷에 살짝 걸친 내용도 인식되게
 
 export default function CameraScreen() {
   const navigate = useNavigate()
@@ -103,10 +104,14 @@ export default function CameraScreen() {
       const scale = Math.max(vr.width / vw, vr.height / vh)
       const ox = (vw * scale - vr.width) / 2
       const oy = (vh * scale - vr.height) / 2
-      sx = Math.max(0, (gr.x - vr.x + ox) / scale)
-      sy = Math.max(0, (gr.y - vr.y + oy) / scale)
-      sw = Math.min(vw - sx, gr.width / scale)
-      sh = Math.min(vh - sy, gr.height / scale)
+      const rawW = gr.width / scale
+      const rawH = gr.height / scale
+      const padX = (rawW * CAPTURE_MARGIN) / 2
+      const padY = (rawH * CAPTURE_MARGIN) / 2
+      sx = Math.max(0, (gr.x - vr.x + ox) / scale - padX)
+      sy = Math.max(0, (gr.y - vr.y + oy) / scale - padY)
+      sw = Math.min(vw - sx, rawW + padX * 2)
+      sh = Math.min(vh - sy, rawH + padY * 2)
     }
 
     const canvas = document.createElement('canvas')
