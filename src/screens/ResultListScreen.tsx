@@ -15,7 +15,7 @@ export default function ResultListScreen() {
   const [pickerOpen, setPickerOpen] = useState(false)
 
   return (
-    <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-gray-200 px-5 pt-12 pb-8">
+    <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-gray-200 px-5 pt-[calc(env(safe-area-inset-top)+30px)] pb-8">
       <div className="relative flex items-center justify-center">
         <button
           type="button"
@@ -29,7 +29,7 @@ export default function ResultListScreen() {
       </div>
 
       {/* 날짜 필터 pill: 탭하면 커스텀 달력 (OS별 편차 없이 동일한 UI) */}
-      <div className="relative mt-10 self-start">
+      <div className="relative mt-[34px] self-start">
         <button
           type="button"
           onClick={() => setPickerOpen((open) => !open)}

@@ -38,7 +38,7 @@ export default function ResultDetailScreen() {
   }
 
   return (
-    <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-white px-6 pt-12 pb-8">
+    <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-white px-6 pt-[calc(env(safe-area-inset-top)+30px)] pb-8">
       <button
         type="button"
         onClick={() => (fromGrading ? navigate('/results', { replace: true }) : navigate(-1))}
@@ -48,7 +48,7 @@ export default function ResultDetailScreen() {
         <img src={iconBack} alt="" className="h-4" />
       </button>
 
-      <p className="mt-8 text-lg text-gray-600">{formatKoreanDate(record.date)}</p>
+      <p className="mt-8 text-lg text-gray-700">{formatKoreanDate(record.date)}</p>
       <h1 className="mt-1 text-2xl font-bold text-gray-900">{record.title}</h1>
 
       <div className="mt-6">
@@ -76,7 +76,7 @@ export default function ResultDetailScreen() {
             <tbody>
               {record.wrongAnswers.map((wrong, index) => (
                 <tr key={index} className="border-b border-gray-300 last:border-0">
-                  <td className="py-5 font-bold text-gray-800">
+                  <td className="py-5 font-bold text-gray-900">
                     {wrong.page != null ? `${wrong.page}p` : '—'}
                   </td>
                   <td className="py-5">

@@ -7,13 +7,13 @@ import Logo from '@/components/Logo'
 
 export default function HomeScreen() {
   return (
-    <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-gray-200 px-6 pt-14 pb-8">
+    <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-gray-200 px-6 pt-[calc(env(safe-area-inset-top)+56px)] pb-8">
       <Logo />
 
       {/* 배너 자리 (콘텐츠 미정 영역) */}
-      <div className="mt-9 h-[175px] rounded-[10px] bg-primary-200" />
+      <div className="mt-[11px] h-[175px] rounded-[10px] bg-primary-200" />
 
-      <div className="mt-[50px] grid grid-cols-2 gap-[13px]">
+      <div className="mt-[30px] grid grid-cols-2 gap-[13px]">
         <Link
           to="/grading/setup"
           className="overflow-hidden rounded-[10px] border border-gray-300 bg-white"

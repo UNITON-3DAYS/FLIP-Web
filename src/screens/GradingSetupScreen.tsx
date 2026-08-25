@@ -32,13 +32,13 @@ export default function GradingSetupScreen() {
   }
 
   return (
-    <main className="relative mx-auto flex min-h-dvh w-full max-w-md flex-col overflow-hidden bg-white px-6 pt-14 pb-6">
+    <main className="relative mx-auto flex min-h-dvh w-full max-w-md flex-col overflow-hidden bg-white px-6 pt-[calc(env(safe-area-inset-top)+56px)] pb-[calc(env(safe-area-inset-bottom)+24px)]">
       <div className="pointer-events-none absolute -top-[88px] -left-[115px] h-[426px] w-[459px] bg-[radial-gradient(50%_50%_at_50%_50%,rgba(153,236,231,0.9)_0%,rgba(255,255,255,0)_100%)] opacity-20" />
 
       <Logo />
-      <h1 className="relative mt-[52px] text-2xl font-bold">문제 유형 선택</h1>
+      <h1 className="relative mt-[32px] text-2xl font-bold text-gray-800">문제 유형 선택</h1>
 
-      <div className="relative mt-12 grid grid-cols-2 gap-[14px]">
+      <div className="relative mt-[26px] -mx-1 grid grid-cols-2 gap-[14px]">
         {EXAM_TYPES.map(({ type, icon, activeIcon }) => {
           const active = examType === type
           return (
@@ -61,7 +61,7 @@ export default function GradingSetupScreen() {
         })}
       </div>
 
-      <div className="relative mt-7">
+      <div className="relative -mx-1 mt-[26px]">
         <DropdownField
           label="타이틀"
           placeholder="타이틀 선택"

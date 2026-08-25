@@ -219,21 +219,21 @@ export default function CameraScreen() {
           type="button"
           onClick={requestExit}
           aria-label="닫기"
-          className="absolute top-4 right-4 text-2xl text-white"
+          className="absolute top-[calc(env(safe-area-inset-top)+16px)] right-4 text-2xl text-white"
         >
           ✕
         </button>
         {flash && <div className="pointer-events-none absolute inset-0 bg-white/70" />}
 
         {running && (
-          <div className="absolute top-10 left-1/2 -translate-x-1/2 rounded-full bg-black/60 px-5 py-2 text-center text-white">
+          <div className="absolute top-[calc(env(safe-area-inset-top)+40px)] left-1/2 -translate-x-1/2 rounded-full bg-black/60 px-5 py-2 text-center text-white">
             <span className="text-2xl font-black text-primary-300">{countdown}</span>
             <span className="ml-2 text-sm">초 후 촬영 · {shotCount}장 완료</span>
           </div>
         )}
       </div>
 
-      <div className="flex flex-col gap-4 px-6 py-6">
+      <div className="flex flex-col gap-4 px-6 pt-6 pb-[calc(env(safe-area-inset-bottom)+24px)]">
         {submitError && <p className="text-center text-sm text-red-400">{submitError}</p>}
         {running || submitting ? (
           <button
