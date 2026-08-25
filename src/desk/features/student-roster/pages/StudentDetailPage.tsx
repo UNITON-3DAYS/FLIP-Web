@@ -51,7 +51,9 @@ function StudentDetailPage() {
             </div>
             <div>
               <p className="text-lg font-bold text-gray-900">{student.name}</p>
-              <p className="text-sm text-gray-600">{student.grade}</p>
+              <p className="text-sm text-gray-600">
+                {student.school} · {student.grade}
+              </p>
             </div>
           </div>
           {average !== null && (

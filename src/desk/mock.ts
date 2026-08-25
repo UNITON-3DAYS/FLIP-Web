@@ -4,6 +4,7 @@ import type { ExamType, WrongAnswer } from '@/types'
 export interface DeskStudent {
   id: string
   name: string
+  school: string
   grade: string
 }
 
@@ -29,10 +30,10 @@ export interface DeskAnswerSheet {
 }
 
 export const STUDENTS: DeskStudent[] = [
-  { id: 's1', name: '김민준', grade: '중2' },
-  { id: 's2', name: '이서연', grade: '중2' },
-  { id: 's3', name: '박지호', grade: '중3' },
-  { id: 's4', name: '최수아', grade: '중1' },
+  { id: 's1', name: '김민준', school: '한빛중학교', grade: '중2' },
+  { id: 's2', name: '이서연', school: '미림중학교', grade: '중2' },
+  { id: 's3', name: '박지호', school: '한빛중학교', grade: '중3' },
+  { id: 's4', name: '최수아', school: '동산중학교', grade: '중1' },
 ]
 
 export const GRADINGS: DeskGrading[] = [

@@ -10,13 +10,18 @@ function StudentRosterPage() {
   const [students, setStudents] = useState(STUDENTS)
   const dialogRef = useRef<HTMLDialogElement>(null)
   const [name, setName] = useState('')
+  const [school, setSchool] = useState('')
   const [grade, setGrade] = useState<string>(GRADES[0])
 
   const addStudent = (e: FormEvent) => {
     e.preventDefault()
-    if (!name.trim()) return
-    setStudents([...students, { id: `s-${Date.now()}`, name: name.trim(), grade }])
+    if (!name.trim() || !school.trim()) return
+    setStudents([
+      ...students,
+      { id: `s-${Date.now()}`, name: name.trim(), school: school.trim(), grade },
+    ])
     setName('')
+    setSchool('')
     dialogRef.current?.close()
   }
 
@@ -49,6 +54,7 @@ function StudentRosterPage() {
           <thead>
             <tr className="border-b border-gray-200 text-gray-600">
               <th className="px-6 py-3 font-medium">이름</th>
+              <th className="px-6 py-3 font-medium">학교</th>
               <th className="px-6 py-3 font-medium">학년</th>
               <th className="px-6 py-3 text-right font-medium">상세보기</th>
             </tr>
@@ -57,6 +63,7 @@ function StudentRosterPage() {
             {students.map((student) => (
               <tr key={student.id} className="border-b border-gray-100 last:border-0">
                 <td className="px-6 py-4 font-bold text-gray-800">{student.name}</td>
+                <td className="px-6 py-4 text-gray-700">{student.school}</td>
                 <td className="px-6 py-4 text-gray-700">{student.grade}</td>
                 <td className="px-6 py-4">
                   <div className="flex items-center justify-end gap-3">
@@ -95,6 +102,13 @@ function StudentRosterPage() {
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="이름"
+            required
+            className="h-10 rounded-[10px] border border-gray-300 px-3 text-sm outline-none placeholder:text-gray-600 focus:border-primary-300"
+          />
+          <input
+            value={school}
+            onChange={(e) => setSchool(e.target.value)}
+            placeholder="학교"
             required
             className="h-10 rounded-[10px] border border-gray-300 px-3 text-sm outline-none placeholder:text-gray-600 focus:border-primary-300"
           />
