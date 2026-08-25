@@ -45,6 +45,18 @@ const MOCK_SCHOOLS: School[] = [
   { schoolId: 4, name: '기타' },
 ]
 
+// 홈 학년 칩용 내 프로필 — GET /students/{id} (schoolName + grade)
+export interface StudentProfile {
+  name: string
+  grade: number
+  schoolName: string
+}
+
+export async function getStudentProfile(): Promise<StudentProfile> {
+  if (!BASE) return { name: loadUser()?.name ?? '학생', grade: 3, schoolName: '중학교' }
+  return request<StudentProfile>(`/students/${studentIdHeader()}`)
+}
+
 export async function getSchools(): Promise<School[]> {
   if (!BASE) return MOCK_SCHOOLS
   const body = await request<{ schools: School[] }>('/schools')

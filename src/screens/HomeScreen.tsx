@@ -7,10 +7,23 @@ import gradingIllustRaw from '@/assets/illust-grading.svg?raw'
 import historyIllustRaw from '@/assets/illust-history.svg?raw'
 import InlineSvg from '@/components/InlineSvg'
 import Logo from '@/components/Logo'
-import { loadUser } from '@/services/records'
+import { useAsync } from '@/hooks/useAsync'
+import { getStudentProfile } from '@/services/api'
+
+// 서버 프로필(schoolName + grade)을 디자인 칩 형식("중1", "고3")으로 축약
+const gradeChip = (schoolName: string, grade: number) => {
+  const school = schoolName.includes('고등학교')
+    ? '고'
+    : schoolName.includes('중학교')
+      ? '중'
+      : schoolName.includes('초등학교')
+        ? '초'
+        : null
+  return school ? `${school}${grade}` : `${grade}학년`
+}
 
 export default function HomeScreen() {
-  const grade = loadUser()?.grade ?? '학생'
+  const { data: profile } = useAsync(getStudentProfile, [])
 
   return (
     <main className="relative mx-auto flex min-h-dvh w-full max-w-md flex-col overflow-hidden bg-gray-200 px-6 pt-[calc(env(safe-area-inset-top)+31px)] pb-8">
@@ -22,9 +35,11 @@ export default function HomeScreen() {
       {/* 히어로: 학년 칩 + 슬로건 + 캐릭터 (선택상세코드.md 절대좌표, 원점 = 로고 아래 y66) */}
       <div className="relative -mx-6 h-[221px]">
         <div className="absolute top-[44px] left-[30px] flex w-[164px] flex-col items-start gap-[9px]">
-          <span className="inline-flex h-[30px] items-center rounded-full border border-primary-300 px-3 text-base leading-[28px] font-bold text-primary-300">
-            {grade}
-          </span>
+          {profile && (
+            <span className="inline-flex h-[30px] items-center rounded-full border border-primary-300 px-3 text-base leading-[28px] font-bold text-primary-300">
+              {gradeChip(profile.schoolName, profile.grade)} - {profile.name}
+            </span>
+          )}
           <p className="text-[22px] leading-[30px] font-bold break-keep text-gray-800">
             채점은 이제 채킷에게 맡기세요!
           </p>

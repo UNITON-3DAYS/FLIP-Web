@@ -2,7 +2,7 @@ import { useParams } from 'react-router-dom'
 
 import Logo from '@/components/Logo'
 import ScoreTrendChart from '@/components/ScoreTrendChart'
-import { getDeskGradings, getDeskStudents } from '@/desk/api'
+import { getDeskGradings, getDeskStudent } from '@/desk/api'
 // 코멘트는 BE 미구현이라 localStorage 목 — API가 생기면 교체
 import { loadComment } from '@/desk/mock'
 import { useAsync } from '@/hooks/useAsync'
@@ -11,10 +11,10 @@ import { useAsync } from '@/hooks/useAsync'
 export default function ParentReportScreen() {
   const { studentId } = useParams()
   const { data, loading, error } = useAsync(
-    () => Promise.all([getDeskStudents(), getDeskGradings()]),
+    () => Promise.all([getDeskStudent(studentId ?? ''), getDeskGradings()]),
     [studentId],
   )
-  const student = data?.[0].find((item) => item.id === studentId)
+  const student = data?.[0]
   // 관리자 목록에 studentId가 없어 이름으로 매칭한다 (동명이인 미고려 — BE 필드 추가 시 교체)
   const gradings = (data?.[1] ?? [])
     .filter((grading) => grading.studentName === student?.name)

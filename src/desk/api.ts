@@ -50,6 +50,25 @@ export async function getDeskStudents(): Promise<DeskStudentView[]> {
   }))
 }
 
+export async function getDeskStudent(id: string): Promise<DeskStudentView | null> {
+  if (!HAS_SERVER) {
+    const student = studentById(id)
+    return student ? { ...student } : null
+  }
+  const body = await request<{
+    studentId: number
+    grade: number
+    name: string
+    schoolName: string
+  }>(`/students/${id}`)
+  return {
+    id: String(body.studentId),
+    name: body.name,
+    school: body.schoolName,
+    grade: `${body.grade}학년`,
+  }
+}
+
 export async function createDeskStudent(input: {
   name: string
   grade: string // '1학년' 형태

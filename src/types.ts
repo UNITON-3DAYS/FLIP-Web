@@ -2,9 +2,9 @@ export type ExamType = '시험지' | '외부 교재'
 
 export interface User {
   name: string
-  school: string
-  grade: string
-  studentId: string // 서버 학생 ID (로그인 API 전 임시: 가입 화면에서 직접 입력)
+  studentId: string // 서버 학생 ID (로그인 API 전 임시: 가입 화면 비밀번호 필드에 입력)
+  school?: string // 서버 프로필로 대체됨 (구버전 저장분 호환용)
+  grade?: string
 }
 
 export interface GradingSetup {

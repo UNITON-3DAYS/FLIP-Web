@@ -2,13 +2,8 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import iconClear from '@/assets/icon-clear.svg'
-import DropdownField from '@/components/DropdownField'
 import Logo from '@/components/Logo'
-import { useAsync } from '@/hooks/useAsync'
-import { getSchools } from '@/services/api'
 import { saveUser } from '@/services/records'
-
-const GRADES = ['1학년', '2학년', '3학년']
 
 const fieldClass = 'relative flex flex-col gap-1 rounded-xl bg-gray-200 px-5 py-[18px]'
 const labelClass = 'text-xs font-medium text-gray-700'
@@ -31,22 +26,13 @@ function ClearButton({ show, onClear, label }: { show: boolean; onClear: () => v
 export default function SignUpScreen() {
   const navigate = useNavigate()
   const [name, setName] = useState('')
-  const [school, setSchool] = useState('')
-  const [grade, setGrade] = useState('')
-  const [studentId, setStudentId] = useState('')
-  const [retry, setRetry] = useState(0)
-  const { data: schools, loading: schoolsLoading, error: schoolsError } = useAsync(
-    getSchools,
-    [retry],
-  )
-  const schoolNames = (schools ?? []).map((item) => item.name)
+  const [password, setPassword] = useState('')
 
-  const canSubmit =
-    [name.trim(), school, grade].every((v) => v !== '') && /^\d+$/.test(studentId.trim())
+  // 로그인 API 전 임시: 비밀번호 자리에 서버 학생 ID(숫자)를 입력받는다
+  const canSubmit = name.trim() !== '' && /^\d+$/.test(password.trim())
 
   const submit = () => {
-    // 로그인 API 전 임시: 서버 학생 ID를 직접 입력받아 저장 (API 헤더에 사용)
-    saveUser({ name: name.trim(), school, grade, studentId: studentId.trim() })
+    saveUser({ name: name.trim(), studentId: password.trim() })
     navigate('/home', { replace: true })
   }
 
@@ -69,52 +55,20 @@ export default function SignUpScreen() {
           <ClearButton show={name !== ''} onClear={() => setName('')} label="이름 지우기" />
         </label>
 
-        <div>
-          <div className="grid grid-cols-2 gap-3">
-            <DropdownField
-              label="학교"
-              placeholder={schoolsLoading ? '불러오는 중...' : '학교 선택'}
-              value={school}
-              options={schoolNames}
-              onChange={setSchool}
-            />
-            <DropdownField
-              label="학년"
-              placeholder="학년 선택"
-              value={grade}
-              options={GRADES}
-              onChange={setGrade}
-            />
-          </div>
-          {schoolsError ? (
-            <p className="mt-2 px-1 text-sm text-gray-600">
-              학교 목록을 불러오지 못했어요.{' '}
-              <button
-                type="button"
-                onClick={() => setRetry((count) => count + 1)}
-                className="font-semibold text-primary-300"
-              >
-                다시 시도
-              </button>
-            </p>
-          ) : !schoolsLoading && schoolNames.length === 0 ? (
-            <p className="mt-2 px-1 text-sm text-gray-600">선택할 수 있는 학교가 없어요.</p>
-          ) : null}
-        </div>
-
         <label className={fieldClass}>
-          <span className={labelClass}>학생 ID</span>
+          <span className={labelClass}>비밀번호</span>
           <input
             className={controlClass}
+            type="password"
             inputMode="numeric"
-            value={studentId}
-            placeholder="학생 ID 입력 (예: 1)"
-            onChange={(e) => setStudentId(e.target.value)}
+            value={password}
+            placeholder="비밀번호 입력"
+            onChange={(e) => setPassword(e.target.value)}
           />
           <ClearButton
-            show={studentId !== ''}
-            onClear={() => setStudentId('')}
-            label="학생 ID 지우기"
+            show={password !== ''}
+            onClear={() => setPassword('')}
+            label="비밀번호 지우기"
           />
         </label>
       </div>
