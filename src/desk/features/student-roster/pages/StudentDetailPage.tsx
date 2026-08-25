@@ -144,7 +144,7 @@ function StudentDetailPage() {
                       : `${grading.score}점`}
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <ViewChip to={`/grading/${grading.id}`} />
+                    <ViewChip to={`/grading/${grading.id}`} state={{ from: `/students/${studentId}` }} />
                   </td>
                 </tr>
               ))}

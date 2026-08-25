@@ -1,10 +1,11 @@
 import { Link } from 'react-router-dom'
 
 // 대시보드 표의 '보기' 버튼 — primary/50 배경, 라운딩 100 chip
-function ViewChip({ to }: { to: string }) {
+function ViewChip({ to, state }: { to: string; state?: unknown }) {
   return (
     <Link
       to={to}
+      state={state}
       className="inline-flex items-center gap-1 rounded-full bg-primary-50 py-1.5 pr-2.5 pl-3.5 text-sm font-bold text-primary-400"
     >
       보기

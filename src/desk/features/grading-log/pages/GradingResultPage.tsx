@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useLocation, useParams } from 'react-router-dom'
 
 import ScoreDonut from '@/components/ScoreDonut'
 import { getDeskGradings } from '@/desk/api'
@@ -8,6 +8,10 @@ import { useAsync } from '@/hooks/useAsync'
 
 function GradingResultPage() {
   const { recordId } = useParams()
+  // 학생 상세에서 진입했으면 그 화면으로 되돌아간다
+  const from = (useLocation().state as { from?: string } | null)?.from
+  const backTo = from ?? '/grading'
+  const backLabel = from ? '학생 정보' : '채점 내역'
   const { data: gradings, loading, error } = useAsync(getDeskGradings, [])
   const grading = gradings?.find((item) => item.id === recordId)
   const [comment, setComment] = useState(() => loadComment(recordId ?? ''))
@@ -38,7 +42,7 @@ function GradingResultPage() {
   return (
     <section>
       <Link
-        to="/grading"
+        to={backTo}
         className="inline-flex items-center gap-1 text-sm font-medium text-gray-600"
       >
         <svg className="size-4" viewBox="0 0 16 16" fill="none" aria-hidden>
@@ -50,7 +54,7 @@ function GradingResultPage() {
             strokeLinejoin="round"
           />
         </svg>
-        채점 내역
+        {backLabel}
       </Link>
 
       <div className="mt-4 grid grid-cols-2 gap-6">
