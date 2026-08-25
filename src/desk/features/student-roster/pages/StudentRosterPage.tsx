@@ -5,13 +5,14 @@ import Dropdown from '@/components/Dropdown'
 import ViewChip from '@/components/ViewChip'
 import type { DeskStudentView } from '@/desk/api'
 import { getDeskStudents } from '@/desk/api'
-import { SCHOOLS } from '@/desk/mock'
 import { useAsync } from '@/hooks/useAsync'
+import { getSchools } from '@/services/api'
 
 const GRADES = ['1학년', '2학년', '3학년'] as const
 
 function StudentRosterPage() {
   const { data: serverStudents, loading, error } = useAsync(getDeskStudents, [])
+  const { data: schools, loading: schoolsLoading, error: schoolsError } = useAsync(getSchools, [])
   // 학생 추가·삭제 API는 서버에 없어 화면 상태로만 반영한다 (데모용)
   const [extra, setExtra] = useState<DeskStudentView[]>([])
   const [removedIds, setRemovedIds] = useState<Set<string>>(new Set())
@@ -127,7 +128,15 @@ function StudentRosterPage() {
             required
             className="h-10 rounded-[10px] border border-gray-300 px-3 text-sm outline-none placeholder:text-gray-600 focus:border-primary-300"
           />
-          <Dropdown value={school} options={SCHOOLS} placeholder="학교 선택" onChange={setSchool} />
+          <Dropdown
+            value={school}
+            options={(schools ?? []).map((item) => item.name)}
+            placeholder={schoolsLoading ? '학교 불러오는 중...' : '학교 선택'}
+            onChange={setSchool}
+          />
+          {schoolsError && (
+            <p className="text-xs text-gray-600">학교 목록을 불러오지 못했어요. ({schoolsError})</p>
+          )}
           <Dropdown value={grade} options={GRADES} onChange={setGrade} />
           <div className="mt-2 flex gap-2">
             <button
