@@ -3,8 +3,11 @@ import AppShell from '../layout/AppShell'
 import { StudentRosterPage, StudentDetailPage } from '../features/student-roster'
 import { GradingLogPage, GradingResultPage } from '../features/grading-log'
 import { AnswerSheetPage, AnswerInputPage } from '../features/answer-sheet'
+import ParentReportScreen from '../../screens/ParentReportScreen'
 
 const router = createBrowserRouter([
+  // 학부모 공유 리포트: 셸(사이드바) 없이 단독 렌더
+  { path: '/report/:studentId', element: <ParentReportScreen /> },
   {
     path: '/',
     element: <AppShell />,

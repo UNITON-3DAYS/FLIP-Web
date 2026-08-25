@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import CameraScreen from '@/screens/CameraScreen'
 import GradingSetupScreen from '@/screens/GradingSetupScreen'
 import HomeScreen from '@/screens/HomeScreen'
+import ParentReportScreen from '@/screens/ParentReportScreen'
 import ResultDetailScreen from '@/screens/ResultDetailScreen'
 import ResultListScreen from '@/screens/ResultListScreen'
 import SignUpScreen from '@/screens/SignUpScreen'
@@ -19,6 +20,7 @@ export default function MobileApp() {
         <Route path="/grading/camera" element={<CameraScreen />} />
         <Route path="/results" element={<ResultListScreen />} />
         <Route path="/results/:id" element={<ResultDetailScreen />} />
+        <Route path="/report/:studentId" element={<ParentReportScreen />} />
       </Routes>
     </BrowserRouter>
   )

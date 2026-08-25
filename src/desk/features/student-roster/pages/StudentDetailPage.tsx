@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 
 import ScoreTrendChart from '@/components/ScoreTrendChart'
@@ -8,6 +9,18 @@ function StudentDetailPage() {
   const { studentId } = useParams()
   const student = studentById(studentId)
   const gradings = GRADINGS.filter((grading) => grading.studentId === studentId)
+  const [copied, setCopied] = useState(false)
+
+  const shareReport = async () => {
+    const url = `${window.location.origin}/report/${studentId}`
+    if (navigator.share) {
+      await navigator.share({ title: '채킷 학습 리포트', url }).catch(() => {})
+      return
+    }
+    await navigator.clipboard.writeText(url)
+    setCopied(true)
+    window.setTimeout(() => setCopied(false), 2000)
+  }
 
   if (!student) {
     return (
@@ -27,21 +40,30 @@ function StudentDetailPage() {
 
   return (
     <section>
-      <Link
-        to="/students"
-        className="inline-flex items-center gap-1 text-sm font-medium text-gray-600"
-      >
-        <svg className="size-4" viewBox="0 0 16 16" fill="none" aria-hidden>
-          <path
-            d="M10 3.5 5.5 8l4.5 4.5"
-            stroke="currentColor"
-            strokeWidth="1.8"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-        학생 정보 관리
-      </Link>
+      <div className="flex items-center justify-between">
+        <Link
+          to="/students"
+          className="inline-flex items-center gap-1 text-sm font-medium text-gray-600"
+        >
+          <svg className="size-4" viewBox="0 0 16 16" fill="none" aria-hidden>
+            <path
+              d="M10 3.5 5.5 8l4.5 4.5"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+          학생 정보 관리
+        </Link>
+        <button
+          type="button"
+          onClick={() => void shareReport()}
+          className="rounded-full bg-primary-300 px-4 py-2 text-sm font-bold text-white"
+        >
+          {copied ? '링크 복사됨' : '학부모 리포트 공유'}
+        </button>
+      </div>
 
       <div className="mt-4 grid grid-cols-3 gap-4">
         <div className="rounded-[10px] bg-white p-6">
