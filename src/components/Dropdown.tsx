@@ -42,7 +42,8 @@ export default function Dropdown({ value, options, placeholder, onChange }: Drop
             onClick={() => setOpen(false)}
             className="fixed inset-0 z-10 cursor-default"
           />
-          <ul className="absolute top-full right-0 left-0 z-20 mt-1 max-h-48 overflow-auto rounded-[10px] border border-gray-200 bg-white py-1 shadow-lg">
+          {/* in-flow 렌더: 모달(dialog) 안에서 잘리지 않고 컨테이너가 함께 늘어난다 */}
+          <ul className="relative z-20 mt-1 max-h-48 overflow-auto rounded-[10px] border border-gray-200 bg-white py-1 shadow-lg">
             {options.map((option) => (
               <li key={option}>
                 <button
