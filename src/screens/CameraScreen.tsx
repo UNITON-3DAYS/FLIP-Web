@@ -6,7 +6,7 @@ import GradingWaiting from '@/components/GradingWaiting'
 import { completeSession, createSession, uploadPage } from '@/services/api'
 import type { GradingSetup } from '@/types'
 
-const INTERVAL_SEC = 3 // 촬영 주기 고정 (팀 결정 2026-08-25)
+const INTERVAL_SEC = 4 // 촬영 주기 고정 (3→4초, 팀 결정 2026-08-26)
 const CAPTURE_MARGIN = 0.1 // 가이드 영역보다 10% 넓게 잘라 브래킷에 살짝 걸친 내용도 인식되게
 
 export default function CameraScreen() {
