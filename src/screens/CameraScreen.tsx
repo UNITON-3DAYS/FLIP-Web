@@ -233,8 +233,10 @@ export default function CameraScreen() {
 
         {running && (
           <div className="absolute top-[calc(env(safe-area-inset-top)+40px)] left-1/2 -translate-x-1/2 rounded-full bg-black/60 px-5 py-2 text-center text-white">
-            <span className="text-2xl font-black text-primary-300">{countdown}</span>
-            <span className="ml-2 text-sm">초 후 촬영 · {shotCount}장 완료</span>
+            <span className="text-[15px] font-medium">
+              <span className="font-bold text-primary-300">{countdown}초</span> 후 촬영 ·{' '}
+              {shotCount}장 완료
+            </span>
           </div>
         )}
       </div>
