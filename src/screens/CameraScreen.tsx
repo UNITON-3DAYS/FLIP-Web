@@ -14,6 +14,7 @@ export default function CameraScreen() {
   const setup = (location.state ?? { examType: '시험지', title: '무제' }) as GradingSetup
 
   const videoRef = useRef<HTMLVideoElement>(null)
+  const frameRef = useRef<HTMLDivElement>(null)
   const streamRef = useRef<MediaStream | null>(null)
   const audioCtxRef = useRef<AudioContext | null>(null)
   const wakeLockRef = useRef<WakeLockSentinel | null>(null)
@@ -87,10 +88,31 @@ export default function CameraScreen() {
     const video = videoRef.current
     if (!video || video.videoWidth === 0) return
 
+    // 프리뷰(object-cover)에서 가이드 브래킷이 가리키는 영역만 원본 해상도로 잘라 저장한다.
+    // cover 배율·센터 크롭 오프셋을 역산해 화면 좌표 → 원본 프레임 좌표로 변환.
+    const vw = video.videoWidth
+    const vh = video.videoHeight
+    let sx = 0
+    let sy = 0
+    let sw = vw
+    let sh = vh
+    const guide = frameRef.current
+    if (guide) {
+      const vr = video.getBoundingClientRect()
+      const gr = guide.getBoundingClientRect()
+      const scale = Math.max(vr.width / vw, vr.height / vh)
+      const ox = (vw * scale - vr.width) / 2
+      const oy = (vh * scale - vr.height) / 2
+      sx = Math.max(0, (gr.x - vr.x + ox) / scale)
+      sy = Math.max(0, (gr.y - vr.y + oy) / scale)
+      sw = Math.min(vw - sx, gr.width / scale)
+      sh = Math.min(vh - sy, gr.height / scale)
+    }
+
     const canvas = document.createElement('canvas')
-    canvas.width = video.videoWidth
-    canvas.height = video.videoHeight
-    canvas.getContext('2d')?.drawImage(video, 0, 0)
+    canvas.width = Math.round(sw)
+    canvas.height = Math.round(sh)
+    canvas.getContext('2d')?.drawImage(video, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height)
     canvas.toBlob(
       (blob) => {
         if (!blob) return
@@ -209,8 +231,11 @@ export default function CameraScreen() {
     <main className="relative mx-auto flex h-dvh w-full max-w-md flex-col bg-black">
       <div className="relative flex-1 overflow-hidden">
         <video ref={videoRef} autoPlay playsInline muted className="size-full object-cover" />
-        {/* 촬영 가이드 브래킷 (카메라.svg 실측: 40×30, 두께 6, x35) */}
-        <div className="pointer-events-none absolute right-[35px] left-[35px] top-[calc(env(safe-area-inset-top)+65px)] bottom-[43px]">
+        {/* 촬영 가이드 브래킷 (카메라.svg 실측: 40×30, 두께 6, x35) — 이 영역만 잘라 저장된다 */}
+        <div
+          ref={frameRef}
+          className="pointer-events-none absolute right-[35px] left-[35px] top-[calc(env(safe-area-inset-top)+65px)] bottom-[43px]"
+        >
           <div className="absolute top-0 left-0 h-[30px] w-10 rounded-tl-lg border-t-[6px] border-l-[6px] border-primary-300" />
           <div className="absolute top-0 right-0 h-[30px] w-10 rounded-tr-lg border-t-[6px] border-r-[6px] border-primary-300" />
           <div className="absolute bottom-0 left-0 h-[30px] w-10 rounded-bl-lg border-b-[6px] border-l-[6px] border-primary-300" />
