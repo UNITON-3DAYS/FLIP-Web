@@ -29,34 +29,34 @@ export default function ParentReportScreen() {
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-gray-100 px-5 pt-12 pb-10">
       <Logo className="text-2xl" />
-      <h1 className="mt-6 text-2xl font-bold text-gray-900">{student.name} 학습 리포트</h1>
-      <p className="mt-1 text-sm text-gray-600">
+      <h1 className="mt-6 text-2xl font-semibold text-gray-900">{student.name} 학습 리포트</h1>
+      <p className="mt-1 text-sm font-medium text-gray-700">
         {student.school} · {student.grade} · {period}
       </p>
 
       <div className="mt-6 grid grid-cols-3 gap-3">
         <div className="rounded-[10px] bg-white p-4 text-center">
-          <p className="text-xs text-gray-600">채점 횟수</p>
-          <p className="mt-1 text-2xl font-black text-gray-900">{gradings.length}회</p>
+          <p className="text-xs font-medium text-gray-700">채점 횟수</p>
+          <p className="mt-1 text-2xl font-semibold text-gray-900">{gradings.length}회</p>
         </div>
         <div className="rounded-[10px] bg-white p-4 text-center">
-          <p className="text-xs text-gray-600">평균 점수</p>
-          <p className="mt-1 text-2xl font-black text-primary-300">{average}점</p>
+          <p className="text-xs font-medium text-gray-700">평균 점수</p>
+          <p className="mt-1 text-2xl font-semibold text-primary-300">{average}점</p>
         </div>
         <div className="rounded-[10px] bg-white p-4 text-center">
-          <p className="text-xs text-gray-600">오답 수</p>
-          <p className="mt-1 text-2xl font-black text-secondary">{wrongTotal}</p>
+          <p className="text-xs font-medium text-gray-700">오답 수</p>
+          <p className="mt-1 text-2xl font-semibold text-secondary">{wrongTotal}</p>
         </div>
       </div>
 
       <div className="mt-4 rounded-[10px] bg-white p-5">
-        <h2 className="text-sm font-bold text-gray-800">점수 추이</h2>
+        <h2 className="text-base font-semibold text-gray-1000">점수 추이</h2>
         <div className="mt-2">
           <ScoreTrendChart points={gradings.map((g) => ({ date: g.date, score: g.score }))} />
         </div>
       </div>
 
-      <h2 className="mt-6 mb-3 text-sm font-bold text-gray-800">최근 채점</h2>
+      <h2 className="mt-6 mb-3 text-base font-semibold text-gray-1000">최근 채점</h2>
       <ul className="flex flex-col gap-3">
         {gradings.map((grading) => (
           <li
@@ -64,13 +64,13 @@ export default function ParentReportScreen() {
             className="flex items-center justify-between rounded-[10px] bg-white px-5 py-4"
           >
             <div>
-              <p className="font-bold text-gray-800">{grading.title}</p>
-              <p className="mt-1 text-xs text-gray-600">
+              <p className="font-semibold text-gray-900">{grading.title}</p>
+              <p className="mt-1 text-xs font-medium text-gray-700">
                 {grading.date.replaceAll('-', '.')} · {grading.examType} · 오답{' '}
                 {grading.wrongAnswers.length}개
               </p>
             </div>
-            <span className="text-lg font-black text-primary-400">{grading.score}점</span>
+            <span className="text-lg font-semibold text-primary-300">{grading.score}점</span>
           </li>
         ))}
       </ul>
