@@ -9,18 +9,26 @@ const NAV_ITEMS = [
 
 function Sidebar() {
   return (
-    <aside className="flex w-48 shrink-0 flex-col gap-1 border-r border-gray-200 bg-gray-50 p-3">
-      {NAV_ITEMS.map((item) => (
-        <NavLink
-          key={item.to}
-          to={item.to}
-          className={({ isActive }) =>
-            `rounded px-3 py-2 text-sm ${isActive ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-200'}`
-          }
-        >
-          {item.label}
-        </NavLink>
-      ))}
+    <aside className="flex w-64 shrink-0 flex-col border-r border-gray-200 bg-gray-50">
+      <div className="flex h-16 shrink-0 items-center px-5">
+        <div className="size-8 rounded-md bg-gray-300" /> {/* TODO(ui): 로고 */}
+      </div>
+      <nav className="flex flex-1 flex-col gap-1 px-4">
+        {NAV_ITEMS.map((item) => (
+          <NavLink
+            key={item.to}
+            to={item.to}
+            className={({ isActive }) =>
+              `rounded-lg px-4 py-2.5 text-sm font-medium ${isActive ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-200'}`
+            }
+          >
+            {item.label}
+          </NavLink>
+        ))}
+      </nav>
+      <div className="flex items-center gap-3 border-t border-gray-200 p-4">
+        <div className="size-9 rounded-full bg-gray-300" /> {/* TODO(ui): 프로필 */}
+      </div>
     </aside>
   )
 }
