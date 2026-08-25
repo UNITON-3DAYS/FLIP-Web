@@ -13,26 +13,20 @@ const EXAM_TYPES: { type: ExamType; icon: string; activeIcon: string }[] = [
   { type: '시험지', icon: iconExam, activeIcon: iconExamActive },
   { type: '외부 교재', icon: iconBook, activeIcon: iconBookActive },
 ]
-const BOOKS = ['쎈 2-1', '개념원리 2-1', 'RPM 2-1', '일품 2-1']
-
-const fieldClass = 'relative flex flex-col justify-center gap-1 rounded-xl bg-gray-200 px-5 py-4'
-const labelClass = 'text-xs font-medium text-gray-700'
-const controlClass = 'bg-transparent text-base outline-none placeholder:text-gray-600'
+// 디자인: 타이틀은 목록에서 선택 (자유 입력 없음)
+const TITLES = ['쎈 2-1', '개념원리 2-1', 'RPM 2-1', '일품 2-1', '중간 대비 모의']
 
 export default function GradingSetupScreen() {
   const navigate = useNavigate()
-  const [examType, setExamType] = useState<ExamType>('시험지')
+  // 디자인(문제유형입력1): 초기에는 아무 유형도 선택되지 않은 상태
+  const [examType, setExamType] = useState<ExamType | null>(null)
   const [title, setTitle] = useState('')
-  const [bookName, setBookName] = useState('')
 
-  const canSubmit = title.trim() !== '' && (examType === '시험지' || bookName !== '')
+  const canSubmit = examType !== null && title !== ''
 
   const submit = () => {
-    const setup: GradingSetup = {
-      examType,
-      title: title.trim(),
-      bookName: examType === '외부 교재' ? bookName : undefined,
-    }
+    if (examType === null) return
+    const setup: GradingSetup = { examType, title }
     // replace: 채점 완료 후 뒤로가기 시 설정 화면으로 재진입하지 않게 스택에서 제거
     navigate('/grading/camera', { state: setup, replace: true })
   }
@@ -67,26 +61,14 @@ export default function GradingSetupScreen() {
         })}
       </div>
 
-      <div className="relative mt-7 flex flex-col gap-4">
-        {examType === '외부 교재' && (
-          <DropdownField
-            label="교재"
-            placeholder="교재 선택"
-            value={bookName}
-            options={BOOKS}
-            onChange={setBookName}
-          />
-        )}
-
-        <label className={fieldClass}>
-          <span className={labelClass}>타이틀</span>
-          <input
-            className={controlClass}
-            value={title}
-            placeholder="타이틀 입력"
-            onChange={(e) => setTitle(e.target.value)}
-          />
-        </label>
+      <div className="relative mt-7">
+        <DropdownField
+          label="타이틀"
+          placeholder="타이틀 선택"
+          value={title}
+          options={TITLES}
+          onChange={setTitle}
+        />
       </div>
 
       <button
