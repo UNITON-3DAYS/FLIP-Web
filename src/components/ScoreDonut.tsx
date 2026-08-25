@@ -4,10 +4,10 @@ interface ScoreDonutProps {
   totalCount: number
 }
 
-// 상세 채점 결과의 도넛 차트 — 디자인 실측: 링 바깥지름 190, 안쪽 홀 120 (두께 35)
+// 상세 채점 결과의 도넛 차트 — 디자인 실측: 링 바깥지름 190, 안쪽 홀 132 (두께 29)
 const SIZE = 190
-const STROKE = 35
-const RADIUS = (SIZE - STROKE) / 2 // 77.5 — 링 중심선
+const STROKE = 29
+const RADIUS = (SIZE - STROKE) / 2 // 80.5 — 링 중심선
 
 export default function ScoreDonut({ score, correctCount, totalCount }: ScoreDonutProps) {
   const circumference = 2 * Math.PI * RADIUS
@@ -35,8 +35,8 @@ export default function ScoreDonut({ score, correctCount, totalCount }: ScoreDon
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <p className="text-[40px] leading-[44px] font-semibold text-primary-300">{score}점</p>
-        <p className="text-xl font-medium text-gray-800">
+        <p className="text-[40px] leading-[48px] font-semibold text-primary-300">{score}점</p>
+        <p className="text-xl leading-6 font-medium text-gray-800">
           {correctCount}/{totalCount}
         </p>
       </div>

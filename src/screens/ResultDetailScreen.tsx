@@ -38,7 +38,7 @@ export default function ResultDetailScreen() {
   }
 
   return (
-    <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-white px-6 pt-[calc(env(safe-area-inset-top)+19px)] pb-8">
+    <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-white px-6 pt-[calc(env(safe-area-inset-top)+16px)] pb-8">
       <button
         type="button"
         onClick={() => (fromGrading ? navigate('/results', { replace: true }) : navigate(-1))}
@@ -48,8 +48,10 @@ export default function ResultDetailScreen() {
         <img src={iconBack} alt="" className="h-6" />
       </button>
 
-      <p className="mt-9 text-lg font-medium text-gray-700">{formatKoreanDate(record.date)}</p>
-      <h1 className="mt-1 text-2xl font-semibold text-gray-900">{record.title}</h1>
+      <p className="mt-9 text-lg leading-[21px] font-medium text-gray-700">
+        {formatKoreanDate(record.date)}
+      </p>
+      <h1 className="mt-3 text-2xl leading-[29px] font-semibold text-gray-900">{record.title}</h1>
 
       <div className="mt-3">
         <ScoreDonut
@@ -59,35 +61,31 @@ export default function ResultDetailScreen() {
         />
       </div>
 
-      <h2 className="mt-5 text-base font-semibold text-gray-1000">
+      <h2 className="mt-4 text-base leading-[19px] font-semibold text-gray-1000">
         오답 <span className="text-secondary">{record.wrongAnswers.length}</span>
       </h2>
       {record.wrongAnswers.length === 0 ? (
         <p className="mt-4 text-sm text-gray-600">오답이 없어요. 완벽해요!</p>
       ) : (
-        <div className="mt-2 overflow-hidden rounded-2xl border border-gray-300 bg-white">
-          <table className="w-full text-center text-lg">
-            <thead>
-              <tr className="border-b border-gray-300 bg-gray-200 text-gray-800">
-                <th className="py-[17px] text-base font-semibold">페이지</th>
-                <th className="py-[17px] text-base font-semibold">문제 번호</th>
-              </tr>
-            </thead>
-            <tbody>
-              {record.wrongAnswers.map((wrong, index) => (
-                <tr key={index} className="border-b border-gray-300 last:border-0">
-                  <td className="py-5 font-semibold text-gray-900">
-                    {wrong.page != null ? `${wrong.page}p` : '—'}
-                  </td>
-                  <td className="py-5">
-                    <span className="inline-flex size-8 items-center justify-center rounded-full bg-[#FFD6E2] font-semibold text-secondary">
-                      {wrong.number}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        // 디자인은 표가 아니라 행마다 justify-center + 고정 gap(헤더 96/행 124)인 flex 레이아웃
+        <div className="mt-3 overflow-hidden rounded-2xl border border-gray-500 bg-white">
+          <div className="flex items-center justify-center gap-[96px] border-b border-gray-500 bg-gray-200 py-5 text-base leading-[19px] font-semibold text-gray-800">
+            <span>페이지</span>
+            <span>문제 번호</span>
+          </div>
+          {record.wrongAnswers.map((wrong, index) => (
+            <div
+              key={index}
+              className="flex items-center justify-center gap-[124px] border-b border-gray-500 py-5 last:border-0"
+            >
+              <span className="text-lg leading-[21px] font-semibold text-gray-900">
+                {wrong.page != null ? `${wrong.page}p` : '—'}
+              </span>
+              <span className="inline-flex size-8 items-center justify-center rounded-full bg-[#FFD6E2] text-lg leading-[21px] font-semibold text-secondary">
+                {wrong.number}
+              </span>
+            </div>
+          ))}
         </div>
       )}
     </main>
