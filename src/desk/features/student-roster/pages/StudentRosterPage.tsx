@@ -2,9 +2,9 @@ import { useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 
 import ViewChip from '@/components/ViewChip'
-import { STUDENTS } from '@/desk/mock'
+import { SCHOOLS, STUDENTS } from '@/desk/mock'
 
-const GRADES = ['중1', '중2', '중3'] as const
+const GRADES = ['1학년', '2학년', '3학년'] as const
 
 function StudentRosterPage() {
   const [students, setStudents] = useState(STUDENTS)
@@ -15,11 +15,8 @@ function StudentRosterPage() {
 
   const addStudent = (e: FormEvent) => {
     e.preventDefault()
-    if (!name.trim() || !school.trim()) return
-    setStudents([
-      ...students,
-      { id: `s-${Date.now()}`, name: name.trim(), school: school.trim(), grade },
-    ])
+    if (!name.trim() || !school) return
+    setStudents([...students, { id: `s-${Date.now()}`, name: name.trim(), school, grade }])
     setName('')
     setSchool('')
     dialogRef.current?.close()
@@ -105,13 +102,23 @@ function StudentRosterPage() {
             required
             className="h-10 rounded-[10px] border border-gray-300 px-3 text-sm outline-none placeholder:text-gray-600 focus:border-primary-300"
           />
-          <input
+          <select
             value={school}
             onChange={(e) => setSchool(e.target.value)}
-            placeholder="학교"
             required
-            className="h-10 rounded-[10px] border border-gray-300 px-3 text-sm outline-none placeholder:text-gray-600 focus:border-primary-300"
-          />
+            className={`h-10 rounded-[10px] border border-gray-300 px-2 text-sm outline-none focus:border-primary-300 ${
+              school ? '' : 'text-gray-600'
+            }`}
+          >
+            <option value="" disabled>
+              학교 선택
+            </option>
+            {SCHOOLS.map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
+          </select>
           <select
             value={grade}
             onChange={(e) => setGrade(e.target.value)}

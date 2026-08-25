@@ -29,11 +29,14 @@ export interface DeskAnswerSheet {
   filled: boolean
 }
 
+// 학교 목록 조회 API 연동 전 목 — 연동 시 services 레이어로 교체
+export const SCHOOLS = ['한빛중학교', '미림중학교', '동산중학교', '세화중학교']
+
 export const STUDENTS: DeskStudent[] = [
-  { id: 's1', name: '김민준', school: '한빛중학교', grade: '중2' },
-  { id: 's2', name: '이서연', school: '미림중학교', grade: '중2' },
-  { id: 's3', name: '박지호', school: '한빛중학교', grade: '중3' },
-  { id: 's4', name: '최수아', school: '동산중학교', grade: '중1' },
+  { id: 's1', name: '김민준', school: '한빛중학교', grade: '2학년' },
+  { id: 's2', name: '이서연', school: '미림중학교', grade: '2학년' },
+  { id: 's3', name: '박지호', school: '한빛중학교', grade: '3학년' },
+  { id: 's4', name: '최수아', school: '동산중학교', grade: '1학년' },
 ]
 
 export const GRADINGS: DeskGrading[] = [
