@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom'
 
 import iconBookActive from '@/assets/icon-book-active.svg'
 import iconBook from '@/assets/icon-book.svg'
-import iconChevronDown from '@/assets/icon-chevron-down.svg'
 import iconExamActive from '@/assets/icon-exam-active.svg'
 import iconExam from '@/assets/icon-exam.svg'
+import DropdownField from '@/components/DropdownField'
 import Logo from '@/components/Logo'
 import type { ExamType, GradingSetup } from '@/types'
 
@@ -69,28 +69,13 @@ export default function GradingSetupScreen() {
 
       <div className="relative mt-7 flex flex-col gap-4">
         {examType === '외부 교재' && (
-          <label className={fieldClass}>
-            <span className={labelClass}>교재</span>
-            <select
-              className={`${controlClass} appearance-none ${bookName === '' ? 'text-gray-600' : ''}`}
-              value={bookName}
-              onChange={(e) => setBookName(e.target.value)}
-            >
-              <option value="" disabled>
-                교재 선택
-              </option>
-              {BOOKS.map((book) => (
-                <option key={book} value={book}>
-                  {book}
-                </option>
-              ))}
-            </select>
-            <img
-              src={iconChevronDown}
-              alt=""
-              className="pointer-events-none absolute top-1/2 right-4 w-4 -translate-y-1/2"
-            />
-          </label>
+          <DropdownField
+            label="교재"
+            placeholder="교재 선택"
+            value={bookName}
+            options={BOOKS}
+            onChange={setBookName}
+          />
         )}
 
         <label className={fieldClass}>

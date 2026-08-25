@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-import iconChevronDown from '@/assets/icon-chevron-down.svg'
 import iconClear from '@/assets/icon-clear.svg'
+import DropdownField from '@/components/DropdownField'
 import Logo from '@/components/Logo'
 import { saveUser } from '@/services/records'
 
@@ -61,50 +61,20 @@ export default function SignUpScreen() {
         </label>
 
         <div className="grid grid-cols-2 gap-3">
-          <label className={fieldClass}>
-            <span className={labelClass}>학교</span>
-            <select
-              className={`${controlClass} appearance-none ${school === '' ? 'text-gray-600' : ''}`}
-              value={school}
-              onChange={(e) => setSchool(e.target.value)}
-            >
-              <option value="" disabled>
-                학교 선택
-              </option>
-              {SCHOOLS.map((s) => (
-                <option key={s} value={s}>
-                  {s}
-                </option>
-              ))}
-            </select>
-            <img
-              src={iconChevronDown}
-              alt=""
-              className="pointer-events-none absolute top-1/2 right-4 w-4 -translate-y-1/2"
-            />
-          </label>
-          <label className={fieldClass}>
-            <span className={labelClass}>학년</span>
-            <select
-              className={`${controlClass} appearance-none ${grade === '' ? 'text-gray-600' : ''}`}
-              value={grade}
-              onChange={(e) => setGrade(e.target.value)}
-            >
-              <option value="" disabled>
-                학년 선택
-              </option>
-              {GRADES.map((g) => (
-                <option key={g} value={g}>
-                  {g}
-                </option>
-              ))}
-            </select>
-            <img
-              src={iconChevronDown}
-              alt=""
-              className="pointer-events-none absolute top-1/2 right-4 w-4 -translate-y-1/2"
-            />
-          </label>
+          <DropdownField
+            label="학교"
+            placeholder="학교 선택"
+            value={school}
+            options={SCHOOLS}
+            onChange={setSchool}
+          />
+          <DropdownField
+            label="학년"
+            placeholder="학년 선택"
+            value={grade}
+            options={GRADES}
+            onChange={setGrade}
+          />
         </div>
 
         <label className={fieldClass}>
