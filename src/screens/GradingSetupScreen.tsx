@@ -47,7 +47,7 @@ export default function GradingSetupScreen() {
               type="button"
               onClick={() => setExamType(type)}
               className={`flex h-[117px] flex-col items-center justify-center gap-3 rounded-xl border-[3px] ${
-                active ? 'border-primary-300 bg-[#EDFFFD]' : 'border-transparent bg-gray-200'
+                active ? 'border-primary-300 bg-primary-50' : 'border-transparent bg-gray-200'
               }`}
             >
               <img src={active ? activeIcon : icon} alt="" className="h-[35px]" />

@@ -57,7 +57,7 @@ export default function DropdownField({
                     setOpen(false)
                   }}
                   className={`w-full px-5 py-3 text-left text-base ${
-                    option === value ? 'bg-[#EDFFFD] font-bold text-primary-400' : 'text-gray-900'
+                    option === value ? 'bg-primary-50 font-bold text-primary-400' : 'text-gray-900'
                   }`}
                 >
                   {option}
