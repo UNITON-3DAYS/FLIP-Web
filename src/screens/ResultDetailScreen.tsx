@@ -38,7 +38,7 @@ export default function ResultDetailScreen() {
   }
 
   return (
-    <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-white px-6 pt-[calc(env(safe-area-inset-top)+30px)] pb-8">
+    <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-white px-6 pt-[calc(env(safe-area-inset-top)+22px)] pb-8">
       <button
         type="button"
         onClick={() => (fromGrading ? navigate('/results', { replace: true }) : navigate(-1))}
@@ -51,7 +51,7 @@ export default function ResultDetailScreen() {
       <p className="mt-10 text-lg text-gray-700">{formatKoreanDate(record.date)}</p>
       <h1 className="mt-1 text-2xl font-bold text-gray-900">{record.title}</h1>
 
-      <div className="mt-1">
+      <div className="mt-3">
         <ScoreDonut
           score={record.score}
           correctCount={record.correctCount}
@@ -65,12 +65,12 @@ export default function ResultDetailScreen() {
       {record.wrongAnswers.length === 0 ? (
         <p className="mt-4 text-sm text-gray-600">오답이 없어요. 완벽해요!</p>
       ) : (
-        <div className="mt-2 overflow-hidden rounded-xl border border-gray-300 bg-white">
-          <table className="w-full text-center">
+        <div className="mt-2 overflow-hidden rounded-2xl border border-gray-300 bg-white">
+          <table className="w-full text-center text-lg">
             <thead>
               <tr className="border-b border-gray-300 bg-gray-100 text-gray-800">
-                <th className="py-4 font-bold">페이지</th>
-                <th className="py-4 font-bold">문제 번호</th>
+                <th className="py-[17px] text-[17px] font-bold">페이지</th>
+                <th className="py-[17px] text-[17px] font-bold">문제 번호</th>
               </tr>
             </thead>
             <tbody>

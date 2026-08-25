@@ -10,7 +10,7 @@ export default function ScoreDonut({ score, correctCount, totalCount }: ScoreDon
   const circumference = 2 * Math.PI * radius
 
   return (
-    <div className="relative mx-auto w-[200px]">
+    <div className="relative mx-auto w-[190px]">
       <svg viewBox="0 0 220 220" className="w-full">
         <circle cx="110" cy="110" r={radius} fill="none" stroke="var(--color-gray-100)" strokeWidth="42" />
         <circle
