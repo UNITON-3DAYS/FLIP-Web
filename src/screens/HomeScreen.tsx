@@ -36,7 +36,7 @@ export default function HomeScreen() {
       <div className="relative -mx-6 h-[221px]">
         <div className="absolute top-[44px] left-[30px] flex w-[164px] flex-col items-start gap-[9px]">
           {profile && (
-            <span className="inline-flex h-[30px] items-center rounded-full border border-primary-300 px-3 text-base leading-[28px] font-bold text-primary-300">
+            <span className="inline-flex h-[30px] items-center rounded-full border border-primary-300 px-3 text-sm leading-[28px] font-bold text-primary-300">
               {gradeChip(profile.schoolName, profile.grade)} - {profile.name}
             </span>
           )}
