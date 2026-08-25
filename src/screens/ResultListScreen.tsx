@@ -20,10 +20,10 @@ export default function ResultListScreen() {
         <button
           type="button"
           onClick={() => navigate('/home')}
-          className="absolute left-0"
+          className="absolute left-0 -m-2 p-2"
           aria-label="뒤로"
         >
-          <img src={iconBack} alt="" className="h-4" />
+          <img src={iconBack} alt="" className="h-6" />
         </button>
         <h1 className="text-lg font-bold text-gray-800">채점 내역</h1>
       </div>

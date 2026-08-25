@@ -42,7 +42,7 @@ export default function ResultDetailScreen() {
       <button
         type="button"
         onClick={() => (fromGrading ? navigate('/results', { replace: true }) : navigate(-1))}
-        className="self-start"
+        className="-m-2 self-start p-2"
         aria-label="뒤로"
       >
         <img src={iconBack} alt="" className="h-6" />
