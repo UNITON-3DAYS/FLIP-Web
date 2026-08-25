@@ -1,0 +1,236 @@
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
+
+import { completeSession, createSession, uploadPage } from '@/services/api'
+import type { GradingSetup } from '@/types'
+
+const INTERVAL_SEC = 3 // 촬영 주기 고정 (팀 결정 2026-08-25)
+
+export default function CameraScreen() {
+  const navigate = useNavigate()
+  const location = useLocation()
+  const setup = (location.state ?? { examType: '시험지', title: '무제' }) as GradingSetup
+
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const streamRef = useRef<MediaStream | null>(null)
+  const audioCtxRef = useRef<AudioContext | null>(null)
+  const wakeLockRef = useRef<WakeLockSentinel | null>(null)
+  const sessionIdRef = useRef<string | null>(null)
+  const seqRef = useRef(0)
+  const uploadsRef = useRef<Promise<void>[]>([])
+  const failedRef = useRef<{ seq: number; image: Blob }[]>([])
+
+  const [cameraError, setCameraError] = useState(false)
+  const [running, setRunning] = useState(false)
+  const [countdown, setCountdown] = useState(0)
+  const [shotCount, setShotCount] = useState(0)
+  const [flash, setFlash] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
+
+  // 카메라 스트림 연결/해제
+  useEffect(() => {
+    navigator.mediaDevices
+      // ideal이라 기기가 지원하는 최대치까지만 올라간다 (미지원 기기도 실패하지 않음)
+      .getUserMedia({
+        video: { facingMode: 'environment', width: { ideal: 4096 }, height: { ideal: 2160 } },
+      })
+      .then((stream) => {
+        streamRef.current = stream
+        if (videoRef.current) videoRef.current.srcObject = stream
+      })
+      .catch(() => setCameraError(true))
+    return () => {
+      streamRef.current?.getTracks().forEach((track) => track.stop())
+      wakeLockRef.current?.release().catch(() => {})
+    }
+  }, [])
+
+  // 촬영한 장은 즉시 업로드한다 (버저 간격 동안 회선이 놀지 않게). 실패분은 종료 시 일괄 재시도.
+  const uploadShot = useCallback((seq: number, image: Blob) => {
+    const task = (async () => {
+      const sessionId = sessionIdRef.current
+      if (!sessionId) return
+      try {
+        await uploadPage(sessionId, seq, image)
+      } catch {
+        failedRef.current.push({ seq, image })
+      }
+    })()
+    uploadsRef.current.push(task)
+  }, [])
+
+  const capture = useCallback(() => {
+    const video = videoRef.current
+    if (!video || video.videoWidth === 0) return
+
+    const canvas = document.createElement('canvas')
+    canvas.width = video.videoWidth
+    canvas.height = video.videoHeight
+    canvas.getContext('2d')?.drawImage(video, 0, 0)
+    canvas.toBlob(
+      (blob) => {
+        if (!blob) return
+        seqRef.current += 1
+        setShotCount(seqRef.current)
+        uploadShot(seqRef.current, blob)
+      },
+      'image/jpeg',
+      0.92,
+    )
+
+    // 버저: 비프음 + 진동(Android) + 화면 플래시(iOS 보완)
+    const ctx = audioCtxRef.current
+    if (ctx) {
+      const osc = ctx.createOscillator()
+      const gain = ctx.createGain()
+      osc.connect(gain)
+      gain.connect(ctx.destination)
+      osc.frequency.value = 880
+      gain.gain.setValueAtTime(0.3, ctx.currentTime)
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25)
+      osc.start()
+      osc.stop(ctx.currentTime + 0.25)
+    }
+    navigator.vibrate?.(200)
+    setFlash(true)
+    window.setTimeout(() => setFlash(false), 250)
+  }, [uploadShot])
+
+  // 1초마다 카운트다운, 0이 되면 캡처 후 리셋
+  useEffect(() => {
+    if (!running) return
+    let remaining = INTERVAL_SEC
+    const id = window.setInterval(() => {
+      remaining -= 1
+      if (remaining <= 0) {
+        capture()
+        remaining = INTERVAL_SEC
+      }
+      setCountdown(remaining)
+    }, 1000)
+    return () => window.clearInterval(id)
+  }, [running, capture])
+
+  const start = async () => {
+    // 사용자 제스처 시점에 AudioContext unlock + 화면 꺼짐 방지
+    audioCtxRef.current ??= new AudioContext()
+    void audioCtxRef.current.resume()
+    navigator.wakeLock
+      ?.request('screen')
+      .then((lock) => {
+        wakeLockRef.current = lock
+      })
+      .catch(() => {})
+    setSubmitError(null)
+    try {
+      // 에러 후 재시작하면 기존 세션을 이어간다
+      sessionIdRef.current ??= await createSession(setup)
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : '채점 세션 생성에 실패했어요.')
+      return
+    }
+    setCountdown(INTERVAL_SEC)
+    setRunning(true)
+  }
+
+  const finish = async () => {
+    const sessionId = sessionIdRef.current
+    if (!sessionId) return
+    setRunning(false)
+    setSubmitting(true)
+    setSubmitError(null)
+    try {
+      await Promise.all(uploadsRef.current)
+      const failed = failedRef.current.splice(0)
+      for (const shot of failed) {
+        try {
+          await uploadPage(sessionId, shot.seq, shot.image)
+        } catch {
+          failedRef.current.push(shot)
+          throw new Error(`${shot.seq}번째 장 업로드에 실패했어요. 다시 시도해주세요.`)
+        }
+      }
+      const record = await completeSession(sessionId)
+      navigate(`/results/${record.id}`, { replace: true, state: { from: 'grading' } })
+    } catch (err) {
+      setSubmitting(false)
+      setSubmitError(err instanceof Error ? err.message : '채점 요청에 실패했어요.')
+    }
+  }
+
+  if (cameraError) {
+    return (
+      <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col items-center justify-center bg-black px-6 text-center text-white">
+        <p className="text-lg font-bold">카메라를 열 수 없어요</p>
+        <p className="mt-2 text-sm text-gray-600">
+          브라우저 설정에서 카메라 권한을 허용한 뒤 다시 시도해주세요.
+        </p>
+        <button
+          type="button"
+          onClick={() => navigate(-1)}
+          className="mt-8 rounded-xl bg-primary-300 px-8 py-3 font-bold text-white"
+        >
+          돌아가기
+        </button>
+      </main>
+    )
+  }
+
+  return (
+    // h-dvh 고정: min-h면 video의 h-full(퍼센트 높이)이 무시된다
+    <main className="relative mx-auto flex h-dvh w-full max-w-md flex-col bg-black">
+      <div className="relative flex-1 overflow-hidden">
+        <video ref={videoRef} autoPlay playsInline muted className="size-full object-cover" />
+        {/* 촬영 가이드 브래킷 */}
+        <div className="pointer-events-none absolute inset-8">
+          <div className="absolute top-0 left-0 size-10 rounded-tl border-t-4 border-l-4 border-primary-300" />
+          <div className="absolute top-0 right-0 size-10 rounded-tr border-t-4 border-r-4 border-primary-300" />
+          <div className="absolute bottom-0 left-0 size-10 rounded-bl border-b-4 border-l-4 border-primary-300" />
+          <div className="absolute right-0 bottom-0 size-10 rounded-br border-r-4 border-b-4 border-primary-300" />
+        </div>
+        <button
+          type="button"
+          onClick={() => navigate(-1)}
+          aria-label="닫기"
+          className="absolute top-4 right-4 text-2xl text-white"
+        >
+          ✕
+        </button>
+        {flash && <div className="pointer-events-none absolute inset-0 bg-white/70" />}
+
+        {running && (
+          <div className="absolute top-10 left-1/2 -translate-x-1/2 rounded-full bg-black/60 px-5 py-2 text-center text-white">
+            <span className="text-2xl font-black text-primary-300">{countdown}</span>
+            <span className="ml-2 text-sm">초 후 촬영 · {shotCount}장 완료</span>
+          </div>
+        )}
+      </div>
+
+      <div className="flex flex-col gap-4 px-6 py-6">
+        {submitError && <p className="text-center text-sm text-red-400">{submitError}</p>}
+        {running || submitting ? (
+          <button
+            type="button"
+            disabled={shotCount === 0 || submitting}
+            onClick={() => void finish()}
+            className="rounded-xl bg-primary-300 py-4 text-base font-bold text-white disabled:bg-gray-800 disabled:text-gray-600"
+          >
+            {submitting ? '채점 중...' : '촬영 종료 · 채점하기'}
+          </button>
+        ) : (
+          // 디자인의 원형 셔터 버튼
+          <button
+            type="button"
+            onClick={() => void start()}
+            aria-label="촬영 시작"
+            className="size-16 self-center rounded-full bg-white outline-4 outline-offset-4 outline-primary-300"
+          />
+        )}
+        <p className="text-center text-xs text-gray-700">
+          버저가 울릴 때마다 자동 촬영됩니다. 소리에 맞춰 페이지를 넘겨주세요.
+        </p>
+      </div>
+    </main>
+  )
+}
