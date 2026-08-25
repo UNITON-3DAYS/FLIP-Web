@@ -4,28 +4,38 @@ interface ScoreDonutProps {
   totalCount: number
 }
 
-// 상세 채점 결과의 도넛 차트 (연민트 링 + 중앙 점수)
+// 상세 채점 결과의 도넛 차트 — 디자인 실측: 링 바깥지름 190, 안쪽 홀 120 (두께 35)
+const SIZE = 190
+const STROKE = 35
+const RADIUS = (SIZE - STROKE) / 2 // 77.5 — 링 중심선
+
 export default function ScoreDonut({ score, correctCount, totalCount }: ScoreDonutProps) {
-  const radius = 80
-  const circumference = 2 * Math.PI * radius
+  const circumference = 2 * Math.PI * RADIUS
 
   return (
     <div className="relative mx-auto w-[190px]">
-      <svg viewBox="0 0 220 220" className="w-full">
-        <circle cx="110" cy="110" r={radius} fill="none" stroke="var(--color-gray-100)" strokeWidth="42" />
+      <svg viewBox={`0 0 ${SIZE} ${SIZE}`} className="w-full">
         <circle
-          cx="110"
-          cy="110"
-          r={radius}
+          cx={SIZE / 2}
+          cy={SIZE / 2}
+          r={RADIUS}
+          fill="none"
+          stroke="var(--color-gray-100)"
+          strokeWidth={STROKE}
+        />
+        <circle
+          cx={SIZE / 2}
+          cy={SIZE / 2}
+          r={RADIUS}
           fill="none"
           stroke="var(--color-primary-200)"
-          strokeWidth="42"
+          strokeWidth={STROKE}
           strokeDasharray={`${(score / 100) * circumference} ${circumference}`}
-          transform="rotate(-90 110 110)"
+          transform={`rotate(-90 ${SIZE / 2} ${SIZE / 2})`}
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <p className="text-[40px] leading-[48px] font-semibold text-primary-300">{score}점</p>
+        <p className="text-[40px] leading-[44px] font-semibold text-primary-300">{score}점</p>
         <p className="text-xl font-medium text-gray-800">
           {correctCount}/{totalCount}
         </p>
