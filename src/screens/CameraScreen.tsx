@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 
+import GradingWaiting from '@/components/GradingWaiting'
 import { completeSession, createSession, uploadPage } from '@/services/api'
 import type { GradingSetup } from '@/types'
 
@@ -151,7 +152,11 @@ export default function CameraScreen() {
           throw new Error(`${shot.seq}번째 장 업로드에 실패했어요. 다시 시도해주세요.`)
         }
       }
-      const record = await completeSession(sessionId)
+      // BE 연동 전: 대기 화면을 최소 4초 노출 (팀 결정 2026-08-25, 실채점이 더 오래 걸리면 그만큼 표시)
+      const [record] = await Promise.all([
+        completeSession(sessionId),
+        new Promise((resolve) => window.setTimeout(resolve, 4000)),
+      ])
       navigate(`/results/${record.id}`, { replace: true, state: { from: 'grading' } })
     } catch (err) {
       setSubmitting(false)
@@ -233,6 +238,8 @@ export default function CameraScreen() {
           버저가 울릴 때마다 자동 촬영됩니다. 소리에 맞춰 페이지를 넘겨주세요.
         </p>
       </div>
+
+      {submitting && <GradingWaiting />}
     </main>
   )
 }
