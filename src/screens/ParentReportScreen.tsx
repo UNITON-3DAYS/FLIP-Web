@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom'
 import Logo from '@/components/Logo'
 import ScoreTrendChart from '@/components/ScoreTrendChart'
 // BE 미구현: 대시보드와 같은 목 데이터 사용. 리포트 조회 API가 생기면 교체.
-import { GRADINGS, studentById } from '@/desk/mock'
+import { GRADINGS, loadComment, studentById } from '@/desk/mock'
 
 // 학부모 공유용 읽기 전용 리포트 — 로그인 없이 링크로 열람
 export default function ParentReportScreen() {
@@ -24,6 +24,10 @@ export default function ParentReportScreen() {
 
   const average = Math.round(gradings.reduce((sum, g) => sum + g.score, 0) / gradings.length)
   const wrongTotal = gradings.reduce((sum, g) => sum + g.wrongAnswers.length, 0)
+  // 점수 추이는 시험지 채점만, 시간순 (팀 결정)
+  const examGradings = gradings
+    .filter((grading) => grading.examType === '시험지')
+    .sort((a, b) => a.date.localeCompare(b.date))
   const period = `${gradings[gradings.length - 1].date.replaceAll('-', '.')} ~ ${gradings[0].date.replaceAll('-', '.')}`
 
   return (
@@ -51,28 +55,42 @@ export default function ParentReportScreen() {
 
       <div className="mt-4 rounded-[10px] bg-white p-5">
         <h2 className="text-base font-semibold text-gray-1000">점수 추이</h2>
-        <div className="mt-2">
-          <ScoreTrendChart points={gradings.map((g) => ({ date: g.date, score: g.score }))} />
-        </div>
+        {examGradings.length === 0 ? (
+          <p className="mt-4 text-sm font-medium text-gray-700">아직 시험지 채점 기록이 없어요.</p>
+        ) : (
+          <div className="mt-2">
+            <ScoreTrendChart
+              points={examGradings.map((g) => ({ label: g.title, score: g.score }))}
+            />
+          </div>
+        )}
       </div>
 
       <h2 className="mt-6 mb-3 text-base font-semibold text-gray-1000">최근 채점</h2>
       <ul className="flex flex-col gap-3">
-        {gradings.map((grading) => (
-          <li
-            key={grading.id}
-            className="flex items-center justify-between rounded-[10px] bg-white px-5 py-4"
-          >
-            <div>
-              <p className="font-semibold text-gray-900">{grading.title}</p>
-              <p className="mt-1 text-xs font-medium text-gray-700">
-                {grading.date.replaceAll('-', '.')} · {grading.examType} · 오답{' '}
-                {grading.wrongAnswers.length}개
-              </p>
-            </div>
-            <span className="text-lg font-semibold text-primary-300">{grading.score}점</span>
-          </li>
-        ))}
+        {gradings.map((grading) => {
+          const comment = loadComment(grading.id)
+          return (
+            <li key={grading.id} className="rounded-[10px] bg-white px-5 py-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-semibold text-gray-900">{grading.title}</p>
+                  <p className="mt-1 text-xs font-medium text-gray-700">
+                    {grading.date.replaceAll('-', '.')} · {grading.examType} · 오답{' '}
+                    {grading.wrongAnswers.length}개
+                  </p>
+                </div>
+                <span className="text-lg font-semibold text-primary-300">{grading.score}점</span>
+              </div>
+              {comment !== '' && (
+                <div className="mt-3 rounded-[10px] bg-primary-50 p-3">
+                  <p className="text-xs font-semibold text-primary-400">선생님 코멘트</p>
+                  <p className="mt-1 text-sm font-medium text-gray-900">{comment}</p>
+                </div>
+              )}
+            </li>
+          )
+        })}
       </ul>
 
       <p className="mt-10 text-center text-xs text-gray-600">
