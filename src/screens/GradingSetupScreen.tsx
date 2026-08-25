@@ -20,7 +20,8 @@ export default function GradingSetupScreen() {
       title: title.trim(),
       bookName: examType === '외부 교재' ? bookName : undefined,
     }
-    navigate('/grading/camera', { state: setup })
+    // replace: 채점 완료 후 뒤로가기 시 설정 화면으로 재진입하지 않게 스택에서 제거
+    navigate('/grading/camera', { state: setup, replace: true })
   }
 
   return (

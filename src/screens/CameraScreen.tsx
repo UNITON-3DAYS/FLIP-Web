@@ -101,7 +101,7 @@ export default function CameraScreen() {
   const finish = () => {
     setRunning(false)
     const record = gradeAndSave(setup, shots.length)
-    navigate(`/results/${record.id}`, { replace: true })
+    navigate(`/results/${record.id}`, { replace: true, state: { from: 'grading' } })
   }
 
   if (cameraError) {

@@ -1,11 +1,14 @@
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 
 import { findRecord } from '@/services/records'
 
 export default function ResultDetailScreen() {
   const navigate = useNavigate()
+  const location = useLocation()
   const { id } = useParams()
   const record = id ? findRecord(id) : undefined
+  // 채점 직후 진입이면 히스토리에 내역 화면이 없으므로 replace로 이동해 핑퐁을 막는다
+  const fromGrading = (location.state as { from?: string } | null)?.from === 'grading'
 
   if (!record) {
     return (
@@ -22,7 +25,7 @@ export default function ResultDetailScreen() {
     <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-white px-6 pt-12 pb-8">
       <button
         type="button"
-        onClick={() => navigate('/results')}
+        onClick={() => (fromGrading ? navigate('/results', { replace: true }) : navigate(-1))}
         className="self-start text-xl text-gray-700"
         aria-label="뒤로"
       >

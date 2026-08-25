@@ -10,7 +10,7 @@ export default function ResultListScreen() {
     <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-white px-6 pt-12 pb-8">
       <button
         type="button"
-        onClick={() => navigate(-1)}
+        onClick={() => navigate('/home')}
         className="self-start text-xl text-gray-700"
         aria-label="뒤로"
       >
