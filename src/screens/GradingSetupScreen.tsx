@@ -1,16 +1,18 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
+import iconBook from '@/assets/icon-book.svg'
+import iconExam from '@/assets/icon-exam.svg'
 import Logo from '@/components/Logo'
 import type { ExamType, GradingSetup } from '@/types'
 
 const EXAM_TYPES: { type: ExamType; icon: string }[] = [
-  { type: '시험지', icon: '📄' },
-  { type: '외부 교재', icon: '📚' },
+  { type: '시험지', icon: iconExam },
+  { type: '외부 교재', icon: iconBook },
 ]
 const BOOKS = ['쎈 2-1', '개념원리 2-1', 'RPM 2-1', '일품 2-1']
 
-const fieldClass = 'flex flex-col gap-1 rounded-[10px] bg-gray-100 px-4 py-3'
+const fieldClass = 'relative flex flex-col justify-center gap-1 rounded-xl bg-gray-200 px-5 py-4'
 const labelClass = 'text-xs font-medium text-gray-700'
 const controlClass = 'bg-transparent text-base outline-none placeholder:text-gray-600'
 
@@ -33,29 +35,31 @@ export default function GradingSetupScreen() {
   }
 
   return (
-    <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-white px-6 pt-14 pb-8">
-      <Logo />
-      <h1 className="mt-8 text-2xl font-bold">문제 유형 선택</h1>
+    <main className="relative mx-auto flex min-h-dvh w-full max-w-md flex-col overflow-hidden bg-white px-6 pt-14 pb-6">
+      <div className="pointer-events-none absolute -top-[88px] -left-[115px] h-[426px] w-[459px] bg-[radial-gradient(50%_50%_at_50%_50%,rgba(153,236,231,0.9)_0%,rgba(255,255,255,0)_100%)] opacity-20" />
 
-      <div className="mt-8 grid grid-cols-2 gap-3">
+      <Logo />
+      <h1 className="relative mt-[52px] text-2xl font-bold">문제 유형 선택</h1>
+
+      <div className="relative mt-12 grid grid-cols-2 gap-[14px]">
         {EXAM_TYPES.map(({ type, icon }) => (
           <button
             key={type}
             type="button"
             onClick={() => setExamType(type)}
-            className={`flex flex-col items-center gap-2 rounded-[10px] border py-6 ${
+            className={`flex h-[117px] flex-col items-center justify-center gap-3 rounded-xl border ${
               examType === type
                 ? 'border-primary-300 bg-primary-100'
-                : 'border-transparent bg-gray-100'
+                : 'border-transparent bg-gray-200'
             }`}
           >
-            <span className="text-3xl">{icon}</span>
-            <span className="text-sm font-bold text-gray-800">{type}</span>
+            <img src={icon} alt="" className="h-[35px]" />
+            <span className="text-sm font-medium text-gray-800">{type}</span>
           </button>
         ))}
       </div>
 
-      <div className="mt-6 flex flex-col gap-4">
+      <div className="relative mt-7 flex flex-col gap-4">
         {examType === '외부 교재' && (
           <label className={fieldClass}>
             <span className={labelClass}>교재</span>
@@ -91,7 +95,7 @@ export default function GradingSetupScreen() {
         type="button"
         disabled={!canSubmit}
         onClick={submit}
-        className="mt-auto rounded-xl bg-primary-300 py-4 text-lg font-bold text-white disabled:bg-gray-400 disabled:text-gray-600"
+        className="relative mt-auto h-[60px] rounded-[10px] bg-primary-300 text-xl font-bold text-white disabled:bg-gray-400 disabled:text-gray-600"
       >
         확인
       </button>

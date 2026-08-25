@@ -7,7 +7,7 @@ import { saveUser } from '@/services/records'
 const SCHOOLS = ['서울중학교', '한국중학교', '미래고등학교', '기타']
 const GRADES = ['중1', '중2', '중3', '고1', '고2', '고3']
 
-const fieldClass = 'relative flex flex-col gap-1 rounded-[10px] bg-gray-100 px-4 py-3'
+const fieldClass = 'relative flex flex-col gap-1 rounded-xl bg-gray-200 px-5 py-4'
 const labelClass = 'text-xs font-medium text-gray-700'
 const controlClass = 'bg-transparent text-base outline-none placeholder:text-gray-600'
 
@@ -111,7 +111,7 @@ export default function SignUpScreen() {
         type="button"
         disabled={!canSubmit}
         onClick={submit}
-        className="mt-auto rounded-xl bg-primary-300 py-4 text-lg font-bold text-white disabled:bg-gray-400 disabled:text-gray-600"
+        className="mt-auto h-[60px] rounded-[10px] bg-primary-300 text-xl font-bold text-white disabled:bg-gray-400 disabled:text-gray-600"
       >
         확인
       </button>
