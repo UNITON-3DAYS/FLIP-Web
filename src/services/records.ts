@@ -4,6 +4,13 @@ import type { GradingRecord, GradingSetup, User } from '@/types'
 const RECORDS_KEY = 'checkit_records'
 const USER_KEY = 'checkit_user'
 
+// 데모 시 '오늘' 목록이 비어 보이지 않게 시드 날짜는 실행일 기준 상대값으로 만든다
+const daysAgo = (n: number) => {
+  const d = new Date()
+  d.setDate(d.getDate() - n)
+  return d.toLocaleDateString('sv-SE')
+}
+
 const SEED: GradingRecord[] = [
   {
     id: 'seed-1',
@@ -11,7 +18,7 @@ const SEED: GradingRecord[] = [
     title: '쎈 2-1 오답 점검',
     bookName: '쎈 2-1',
     range: 'p.12 ~ p.18',
-    date: '2026-08-25',
+    date: daysAgo(0),
     score: 82,
     correctCount: 16,
     totalCount: 20,
@@ -27,7 +34,7 @@ const SEED: GradingRecord[] = [
     examType: '시험지',
     title: '1학기 중간 대비 모의',
     range: 'p.1 ~ p.4',
-    date: '2026-08-21',
+    date: daysAgo(4),
     score: 90,
     correctCount: 18,
     totalCount: 20,
