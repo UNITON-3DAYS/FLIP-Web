@@ -163,3 +163,24 @@ export const ANSWER_SHEETS: DeskAnswerSheet[] = [
 ]
 
 export const studentById = (id?: string) => STUDENTS.find((student) => student.id === id)
+
+// 선생님 코멘트 — BE 미구현이라 localStorage 목. API가 생기면 services 레이어로 교체.
+// 같은 브라우저에서 연 학부모 리포트에서만 보인다 (데모 한정).
+const COMMENTS_KEY = 'checkit_teacher_comments'
+
+const loadComments = (): Record<string, string> => {
+  try {
+    return JSON.parse(localStorage.getItem(COMMENTS_KEY) ?? '{}') as Record<string, string>
+  } catch {
+    return {}
+  }
+}
+
+export const loadComment = (gradingId: string): string => loadComments()[gradingId] ?? ''
+
+export function saveComment(gradingId: string, text: string): void {
+  const comments = loadComments()
+  if (text === '') delete comments[gradingId]
+  else comments[gradingId] = text
+  localStorage.setItem(COMMENTS_KEY, JSON.stringify(comments))
+}

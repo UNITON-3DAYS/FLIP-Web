@@ -1,12 +1,22 @@
+import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 
 import ScoreDonut from '@/components/ScoreDonut'
-import { GRADINGS, studentById } from '@/desk/mock'
+import { GRADINGS, loadComment, saveComment, studentById } from '@/desk/mock'
 
 function GradingResultPage() {
   const { recordId } = useParams()
   const grading = GRADINGS.find((item) => item.id === recordId)
   const student = studentById(grading?.studentId)
+  const [comment, setComment] = useState(() => loadComment(recordId ?? ''))
+  const [saved, setSaved] = useState(false)
+
+  const submitComment = () => {
+    saveComment(recordId ?? '', comment.trim())
+    setComment(comment.trim())
+    setSaved(true)
+    window.setTimeout(() => setSaved(false), 2000)
+  }
 
   if (!grading) {
     return (
@@ -80,6 +90,29 @@ function GradingResultPage() {
               </tbody>
             </table>
           </div>
+        </div>
+      </div>
+
+      <div className="mt-6 rounded-[10px] bg-white p-6">
+        <h2 className="text-sm font-bold text-gray-800">선생님 코멘트</h2>
+        <p className="mt-1 text-xs text-gray-600">학부모 리포트에 함께 표시됩니다.</p>
+        <textarea
+          rows={3}
+          maxLength={200}
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
+          placeholder="예: 연산 실수가 눈에 띄게 줄었어요. 도형 단원을 한 번 더 복습하면 좋겠습니다."
+          className="mt-3 w-full resize-none rounded-[10px] border border-gray-300 p-3 text-sm text-gray-900 outline-none placeholder:text-gray-500 focus:border-primary-300"
+        />
+        <div className="mt-2 flex items-center justify-end gap-3">
+          {saved && <span className="text-xs text-gray-600">저장됐어요</span>}
+          <button
+            type="button"
+            onClick={submitComment}
+            className="rounded-full bg-primary-300 px-4 py-2 text-sm font-bold text-white"
+          >
+            코멘트 저장
+          </button>
         </div>
       </div>
     </section>
