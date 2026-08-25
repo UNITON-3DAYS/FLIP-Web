@@ -1,27 +1,14 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { lazy, Suspense } from 'react'
 
-import CameraScreen from '@/screens/CameraScreen'
-import GradingSetupScreen from '@/screens/GradingSetupScreen'
-import HomeScreen from '@/screens/HomeScreen'
-import ResultDetailScreen from '@/screens/ResultDetailScreen'
-import ResultListScreen from '@/screens/ResultListScreen'
-import SignUpScreen from '@/screens/SignUpScreen'
-import SplashScreen from '@/screens/SplashScreen'
+// 데스크톱(선생님)과 모바일(학생 PWA)을 진입 시 한 번 판별해 분리 로드한다.
+// lazy라 각 기기는 자기 쪽 번들만 받는다. 리사이즈 추적은 하지 않음 (필요해지면 추가).
+const DesktopApp = lazy(() => import('@/desk/DesktopApp'))
+const MobileApp = lazy(() => import('@/MobileApp'))
+
+const isDesktop = window.matchMedia('(min-width: 1024px) and (pointer: fine)').matches
 
 function App() {
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<SplashScreen />} />
-        <Route path="/signup" element={<SignUpScreen />} />
-        <Route path="/home" element={<HomeScreen />} />
-        <Route path="/grading/setup" element={<GradingSetupScreen />} />
-        <Route path="/grading/camera" element={<CameraScreen />} />
-        <Route path="/results" element={<ResultListScreen />} />
-        <Route path="/results/:id" element={<ResultDetailScreen />} />
-      </Routes>
-    </BrowserRouter>
-  )
+  return <Suspense fallback={null}>{isDesktop ? <DesktopApp /> : <MobileApp />}</Suspense>
 }
 
 export default App
