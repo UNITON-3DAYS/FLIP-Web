@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom'
 
 import heroCharacter from '@/assets/hero-character.png'
+import heroConfettiRaw from '@/assets/hero-confetti.svg?raw'
+import heroShadowRaw from '@/assets/hero-shadow.svg?raw'
 import gradingIllustRaw from '@/assets/illust-grading.svg?raw'
 import historyIllustRaw from '@/assets/illust-history.svg?raw'
 import InlineSvg from '@/components/InlineSvg'
@@ -28,15 +30,10 @@ export default function HomeScreen() {
           </p>
         </div>
 
-        {/* 그림자 → 캐릭터 → 색종이 순서 (디자인 z 순서) */}
-        <div className="absolute top-[144px] left-[249px] h-[27px] w-[108px] -rotate-[11.64deg] rounded-full bg-gradient-to-r from-[#C5C5C5] to-transparent" />
+        {/* 그림자 → 캐릭터 → 색종이 순서 (디자인 z 순서, 벡터는 선택.svg에서 그대로 추출) */}
+        <InlineSvg raw={heroShadowRaw} className="absolute inset-0" />
         <img src={heroCharacter} alt="" className="absolute top-[29px] left-[197px] size-[170px]" />
-        <div className="absolute top-[99px] left-[211px] h-[10px] w-[9px] -rotate-[53.65deg] bg-primary-300" />
-        <div className="absolute top-[88px] left-[236px] h-[10px] w-[5px] -rotate-[14.76deg] bg-primary-100" />
-        <div className="absolute top-[116px] left-[356px] h-[10px] w-[9px] bg-primary-200 [transform:matrix(-0.59,-0.81,-0.81,0.59,0,0)]" />
-        <div className="absolute top-[105px] left-[337px] h-[10px] w-[5px] bg-[#FFD6E2] [transform:matrix(-0.97,-0.25,-0.25,0.97,0,0)]" />
-        <div className="absolute top-[200px] left-[214px] h-[8px] w-[4px] bg-secondary [transform:matrix(0.51,0.86,0.86,-0.51,0,0)]" />
-        <div className="absolute top-[221px] left-[227px] h-[10px] w-[5px] bg-primary-300 [transform:matrix(0.94,0.35,0.35,-0.94,0,0)]" />
+        <InlineSvg raw={heroConfettiRaw} className="absolute inset-0" />
       </div>
 
       <div className="relative grid grid-cols-[169fr_164fr] gap-2">
