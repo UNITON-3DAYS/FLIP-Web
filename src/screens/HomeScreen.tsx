@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom'
 
-import gradingIllust from '@/assets/illust-grading.svg'
-import historyIllust from '@/assets/illust-history.svg'
+import gradingIllustRaw from '@/assets/illust-grading.svg?raw'
+import historyIllustRaw from '@/assets/illust-history.svg?raw'
+import InlineSvg from '@/components/InlineSvg'
 import Logo from '@/components/Logo'
 
 export default function HomeScreen() {
@@ -21,7 +22,7 @@ export default function HomeScreen() {
             <p className="text-lg font-bold text-gray-900">채점하기</p>
             <p className="mt-1 text-sm font-medium text-gray-700">카메라로 채점하기</p>
           </div>
-          <img src={gradingIllust} alt="" className="mt-1 w-full" />
+          <InlineSvg raw={gradingIllustRaw} className="mt-1 aspect-[164/149] w-full" />
         </Link>
         <Link
           to="/results"
@@ -31,7 +32,7 @@ export default function HomeScreen() {
             <p className="text-lg font-bold text-gray-900">채점 내역</p>
             <p className="mt-1 text-sm font-medium text-gray-700">채점한 내역 모음</p>
           </div>
-          <img src={historyIllust} alt="" className="mt-1 w-full" />
+          <InlineSvg raw={historyIllustRaw} className="mt-1 aspect-[164/149] w-full" />
         </Link>
       </div>
     </main>

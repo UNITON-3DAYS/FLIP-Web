@@ -1,4 +1,5 @@
-import waitAnimation from '@/assets/grading-wait.svg'
+import waitAnimationRaw from '@/assets/grading-wait.svg?raw'
+import InlineSvg from '@/components/InlineSvg'
 import magnifier from '@/assets/illust-magnifier.svg'
 
 // 채점 대기 화면 — 카드 흐름은 디자이너 애니메이션 SVG(돋보기 제거판),
@@ -6,7 +7,7 @@ import magnifier from '@/assets/illust-magnifier.svg'
 export default function GradingWaiting() {
   return (
     <div role="status" className="absolute inset-0 z-30 bg-white">
-      <img src={waitAnimation} alt="채점 중입니다" className="size-full object-cover" />
+      <InlineSvg raw={waitAnimationRaw} label="채점 중입니다" className="size-full" />
       <img
         src={magnifier}
         alt=""
