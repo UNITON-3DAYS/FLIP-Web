@@ -16,8 +16,8 @@ export default function GradingWaiting() {
         <span className="absolute -top-6 -right-4 size-5 rotate-45 animate-pulse bg-primary-300 [animation-delay:400ms]" />
         <span className="absolute top-3 -left-7 h-2 w-3 -rotate-12 bg-secondary" />
 
-        {/* 채점지 카드 스켈레톤 */}
-        <div className="flex w-60 items-center gap-3 rounded-xl bg-white p-4 shadow-[0_8px_24px_rgba(42,48,56,0.1)]">
+        {/* 채점지 카드 스켈레톤: 돋보기 아래로 지나가는 루프 */}
+        <div className="animate-file-pass flex w-60 items-center gap-3 rounded-xl bg-white p-4 shadow-[0_8px_24px_rgba(42,48,56,0.1)]">
           <div className="size-11 shrink-0 rounded-lg bg-[#D9E0E6]" />
           <div className="flex-1">
             <div className="h-3 w-28 rounded-full bg-gray-200" />
@@ -25,12 +25,8 @@ export default function GradingWaiting() {
           </div>
         </div>
 
-        {/* 돋보기(원본 벡터): 카드 우상단에 걸쳐 좌우로 스캔 */}
-        <img
-          src={magnifier}
-          alt=""
-          className="animate-scan absolute -top-12 -right-14 w-[88px]"
-        />
+        {/* 돋보기(원본 벡터): 카드 우상단 고정 */}
+        <img src={magnifier} alt="" className="absolute -top-12 -right-14 w-[88px]" />
       </div>
 
       <p className="relative mt-16 text-2xl font-bold text-gray-900">채점 중입니다...</p>
