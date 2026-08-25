@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 
+import Dropdown from '@/components/Dropdown'
 import ViewChip from '@/components/ViewChip'
 import { SCHOOLS, STUDENTS } from '@/desk/mock'
 
@@ -102,32 +103,8 @@ function StudentRosterPage() {
             required
             className="h-10 rounded-[10px] border border-gray-300 px-3 text-sm outline-none placeholder:text-gray-600 focus:border-primary-300"
           />
-          <select
-            value={school}
-            onChange={(e) => setSchool(e.target.value)}
-            required
-            className={`h-10 rounded-[10px] border border-gray-300 px-2 text-sm outline-none focus:border-primary-300 ${
-              school ? '' : 'text-gray-600'
-            }`}
-          >
-            <option value="" disabled>
-              학교 선택
-            </option>
-            {SCHOOLS.map((s) => (
-              <option key={s} value={s}>
-                {s}
-              </option>
-            ))}
-          </select>
-          <select
-            value={grade}
-            onChange={(e) => setGrade(e.target.value)}
-            className="h-10 rounded-[10px] border border-gray-300 px-2 text-sm outline-none focus:border-primary-300"
-          >
-            {GRADES.map((g) => (
-              <option key={g}>{g}</option>
-            ))}
-          </select>
+          <Dropdown value={school} options={SCHOOLS} placeholder="학교 선택" onChange={setSchool} />
+          <Dropdown value={grade} options={GRADES} onChange={setGrade} />
           <div className="mt-2 flex gap-2">
             <button
               type="button"
