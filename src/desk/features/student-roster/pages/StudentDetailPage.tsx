@@ -14,7 +14,10 @@ function StudentDetailPage() {
   )
   const student = data?.[0]
   // 관리자 목록에 studentId가 없어 이름으로 매칭한다 (동명이인 미고려 — BE 필드 추가 시 교체)
-  const gradings = (data?.[1] ?? []).filter((grading) => grading.studentName === student?.name)
+  // 기록 테이블은 최신순 (내림차순)
+  const gradings = (data?.[1] ?? [])
+    .filter((grading) => grading.studentName === student?.name)
+    .sort((a, b) => b.date.localeCompare(a.date) || Number(b.id) - Number(a.id))
   // 점수 추이는 시험지 채점만, 시간순 최근 5회 (팀 결정)
   const examGradings = gradings
     .filter((grading) => grading.examType === '시험지')
