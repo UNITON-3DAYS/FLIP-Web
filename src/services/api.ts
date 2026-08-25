@@ -92,20 +92,12 @@ export async function uploadPage(sessionId: string, seq: number, image: Blob): P
     mockSessions.get(sessionId)?.pages.add(seq)
     return
   }
-  // 2단계: 스토리지에 파일 업로드 → 발급된 URL을 세션에 등록
+  // 파일을 세션에 직접 업로드한다 (구 /storage/upload 2단계 방식은 서버에서 제거됨)
   const form = new FormData()
   form.append('file', image, `page-${seq}.jpg`)
-  const { fileUrl } = await request<{ fileUrl: string }>('/storage/upload', {
-    method: 'POST',
-    body: form,
-  })
   const { gradingImageId } = await request<{ gradingImageId: number }>(
     `/grading-records/${sessionId}/images`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ imageUrl: fileUrl }),
-    },
+    { method: 'POST', body: form },
   )
   // 업로드는 병렬이라 완료 순서가 아니라 촬영 순서(seq) 기준으로 마지막 장을 기억한다
   const prev = lastImageBySession.get(sessionId)
