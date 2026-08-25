@@ -21,8 +21,20 @@ function GradingResultPage() {
 
   return (
     <section>
-      <Link to="/grading" className="text-sm font-medium text-gray-600">
-        ‹ 채점 내역
+      <Link
+        to="/grading"
+        className="inline-flex items-center gap-1 text-sm font-medium text-gray-600"
+      >
+        <svg className="size-4" viewBox="0 0 16 16" fill="none" aria-hidden>
+          <path
+            d="M10 3.5 5.5 8l4.5 4.5"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+        채점 내역
       </Link>
 
       <div className="mt-4 grid grid-cols-2 gap-6">
@@ -49,14 +61,14 @@ function GradingResultPage() {
           <div className="overflow-hidden rounded-[10px] bg-white">
             <table className="w-full text-center text-sm">
               <thead>
-                <tr className="border-b border-gray-200 bg-gray-100 text-gray-800">
+                <tr className="border-b border-gray-300 bg-gray-200 text-gray-800">
                   <th className="py-3 font-bold">페이지</th>
                   <th className="py-3 font-bold">문제 번호</th>
                 </tr>
               </thead>
               <tbody>
                 {grading.wrongAnswers.map((wrong, index) => (
-                  <tr key={index} className="border-b border-gray-100 last:border-0">
+                  <tr key={index} className="border-b border-gray-200 last:border-0">
                     <td className="py-4 font-bold text-gray-800">{wrong.page}p</td>
                     <td className="py-4">
                       <span className="inline-flex size-8 items-center justify-center rounded-full bg-[#FFDCE7] font-bold text-secondary">
