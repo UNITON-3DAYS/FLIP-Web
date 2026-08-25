@@ -1,4 +1,6 @@
-// 채점 대기 화면 (대기.svg 디자인 — 원본이 깨진 애니메이션 덤프라 코드로 재구성)
+import magnifier from '@/assets/illust-magnifier.svg'
+
+// 채점 대기 화면 (대기.svg 디자인 — 원본이 깨진 애니메이션 덤프라 코드로 재구성, 돋보기는 원본 벡터)
 export default function GradingWaiting() {
   return (
     <div
@@ -23,11 +25,12 @@ export default function GradingWaiting() {
           </div>
         </div>
 
-        {/* 돋보기: 카드 위를 좌우로 스캔 */}
-        <div className="animate-scan absolute -right-2 -bottom-8">
-          <div className="size-10 rounded-full border-[6px] border-primary-300 bg-primary-300/20" />
-          <div className="absolute -right-3 bottom-0 h-2.5 w-6 rotate-45 rounded-full bg-primary-300" />
-        </div>
+        {/* 돋보기(원본 벡터): 카드 우상단에 걸쳐 좌우로 스캔 */}
+        <img
+          src={magnifier}
+          alt=""
+          className="animate-scan absolute -top-12 -right-14 w-[88px]"
+        />
       </div>
 
       <p className="relative mt-16 text-2xl font-bold text-gray-900">채점 중입니다...</p>
