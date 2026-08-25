@@ -85,7 +85,7 @@ export default function ParentReportScreen() {
 
       <h2 className="mt-6 mb-3 text-base font-semibold text-gray-1000">최근 채점</h2>
       <ul className="flex flex-col gap-3">
-        {gradings.map((grading) => {
+        {gradings.slice(0, 10).map((grading) => {
           const comment = loadComment(grading.id)
           return (
             <li key={grading.id} className="rounded-[10px] bg-white px-5 py-4">
