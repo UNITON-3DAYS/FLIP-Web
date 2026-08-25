@@ -16,6 +16,11 @@ export default function Calendar({ value, onSelect }: CalendarProps) {
   const [viewYear, setViewYear] = useState(selected.getFullYear())
   const [viewMonth, setViewMonth] = useState(selected.getMonth())
 
+  // 미래 날짜는 내역이 있을 수 없어 선택 불가
+  const now = new Date()
+  const today = now.toLocaleDateString('sv-SE')
+  const isCurrentMonth = viewYear === now.getFullYear() && viewMonth === now.getMonth()
+
   const firstWeekday = new Date(viewYear, viewMonth, 1).getDay()
   const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate()
   const cells: (number | null)[] = [
@@ -47,8 +52,9 @@ export default function Calendar({ value, onSelect }: CalendarProps) {
           <button
             type="button"
             onClick={() => moveMonth(1)}
+            disabled={isCurrentMonth}
             aria-label="다음 달"
-            className="text-lg font-bold text-primary-300"
+            className="text-lg font-bold text-primary-300 disabled:text-gray-400"
           >
             &gt;
           </button>
@@ -64,24 +70,25 @@ export default function Calendar({ value, onSelect }: CalendarProps) {
       </div>
 
       <div className="grid grid-cols-7 text-center">
-        {cells.map((day, index) =>
-          day === null ? (
-            <span key={`empty-${index}`} />
-          ) : (
+        {cells.map((day, index) => {
+          if (day === null) return <span key={`empty-${index}`} />
+          const dateStr = toDateString(viewYear, viewMonth, day)
+          return (
             <button
               key={day}
               type="button"
-              onClick={() => onSelect(toDateString(viewYear, viewMonth, day))}
+              disabled={dateStr > today}
+              onClick={() => onSelect(dateStr)}
               className={`mx-auto flex size-9 items-center justify-center rounded-full text-sm ${
-                value === toDateString(viewYear, viewMonth, day)
+                value === dateStr
                   ? 'bg-[#D4F7F4] font-bold text-primary-400'
-                  : 'text-gray-900'
+                  : 'text-gray-900 disabled:text-gray-400'
               }`}
             >
               {day}
             </button>
-          ),
-        )}
+          )
+        })}
       </div>
     </div>
   )
