@@ -9,6 +9,10 @@ function StudentDetailPage() {
   const { studentId } = useParams()
   const student = studentById(studentId)
   const gradings = GRADINGS.filter((grading) => grading.studentId === studentId)
+  // 점수 추이는 시험지 채점만, 시간순 (팀 결정)
+  const examGradings = gradings
+    .filter((grading) => grading.examType === '시험지')
+    .sort((a, b) => a.date.localeCompare(b.date))
   const [copied, setCopied] = useState(false)
 
   const shareReport = async () => {
@@ -88,12 +92,12 @@ function StudentDetailPage() {
 
         <div className="col-span-2 rounded-[10px] bg-white p-6">
           <h2 className="text-sm font-bold text-gray-800">점수 추이</h2>
-          {gradings.length === 0 ? (
-            <p className="mt-6 text-sm text-gray-600">아직 채점 기록이 없어요.</p>
+          {examGradings.length === 0 ? (
+            <p className="mt-6 text-sm text-gray-600">아직 시험지 채점 기록이 없어요.</p>
           ) : (
             <div className="mt-2">
               <ScoreTrendChart
-                points={gradings.map((g) => ({ date: g.date, score: g.score }))}
+                points={examGradings.map((g) => ({ label: g.title, score: g.score }))}
               />
             </div>
           )}

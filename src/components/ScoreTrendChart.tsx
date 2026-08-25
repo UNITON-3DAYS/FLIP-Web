@@ -5,15 +5,16 @@ const PAD_TOP = 34
 const PAD_BOTTOM = 30
 
 // 점수 추이 라인 차트 — 의존성 없이 인라인 SVG (y축 0~100 고정)
-function ScoreTrendChart({ points }: { points: { date: string; score: number }[] }) {
-  const sorted = [...points].sort((a, b) => a.date.localeCompare(b.date))
+// x축 라벨은 호출부가 정한다 (현재 정책: 시간순 정렬된 타이틀)
+function ScoreTrendChart({ points }: { points: { label: string; score: number }[] }) {
+  const sorted = points
   const innerW = W - PAD_X * 2
   const innerH = H - PAD_TOP - PAD_BOTTOM
 
   const x = (i: number) =>
     sorted.length === 1 ? W / 2 : PAD_X + (i * innerW) / (sorted.length - 1)
   const y = (score: number) => PAD_TOP + innerH * (1 - score / 100)
-  const monthDay = (date: string) => date.slice(5).replace('-', '.')
+  const shorten = (label: string) => (label.length > 8 ? `${label.slice(0, 8)}…` : label)
 
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className="h-auto w-full">
@@ -38,7 +39,7 @@ function ScoreTrendChart({ points }: { points: { date: string; score: number }[]
         />
       )}
       {sorted.map((p, i) => (
-        <g key={p.date + i}>
+        <g key={p.label + i}>
           <circle
             cx={x(i)}
             cy={y(p.score)}
@@ -64,7 +65,7 @@ function ScoreTrendChart({ points }: { points: { date: string; score: number }[]
             fontSize="12"
             fill="var(--color-gray-600)"
           >
-            {monthDay(p.date)}
+            {shorten(p.label)}
           </text>
         </g>
       ))}
