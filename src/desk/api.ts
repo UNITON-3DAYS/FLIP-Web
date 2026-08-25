@@ -26,7 +26,7 @@ export interface DeskGradingView {
   wrongAnswers: WrongAnswer[]
 }
 
-const EXAM_TYPE_BY_SOURCE: Record<string, ExamType> = {
+export const EXAM_TYPE_BY_SOURCE: Record<string, ExamType> = {
   INHOUSE: '시험지',
   EXTERNAL: '외부 교재',
 }
@@ -48,6 +48,18 @@ export async function getDeskStudents(): Promise<DeskStudentView[]> {
     school: student.schoolName ?? '',
     grade: `${student.grade}학년`,
   }))
+}
+
+export async function createDeskWorksheet(input: {
+  title: string
+  source: 'INHOUSE' | 'EXTERNAL'
+}): Promise<void> {
+  if (!HAS_SERVER) return // 목 모드: 화면 데모만
+  await request('/worksheets', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(input),
+  })
 }
 
 export async function getDeskStudent(id: string): Promise<DeskStudentView | null> {

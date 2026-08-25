@@ -1,8 +1,12 @@
 import { Link } from 'react-router-dom'
 
-import { ANSWER_SHEETS } from '@/desk/mock'
+import { EXAM_TYPE_BY_SOURCE } from '@/desk/api'
+import { useAsync } from '@/hooks/useAsync'
+import { getWorksheets } from '@/services/api'
 
 function AnswerSheetPage() {
+  const { data: worksheets, loading, error } = useAsync(getWorksheets, [])
+
   return (
     <section>
       <div className="mb-4 flex items-center justify-between">
@@ -24,18 +28,23 @@ function AnswerSheetPage() {
             </tr>
           </thead>
           <tbody>
-            {ANSWER_SHEETS.map((sheet) => (
-              <tr key={sheet.id} className="border-b border-gray-100 last:border-0">
-                <td className="px-6 py-4 text-gray-700">{sheet.examType}</td>
+            {(loading || error || (worksheets ?? []).length === 0) && (
+              <tr>
+                <td colSpan={3} className="px-6 py-10 text-center text-gray-600">
+                  {loading ? '불러오는 중...' : (error ?? '등록된 문제지가 없어요.')}
+                </td>
+              </tr>
+            )}
+            {(worksheets ?? []).map((sheet) => (
+              <tr key={sheet.worksheetId} className="border-b border-gray-100 last:border-0">
+                <td className="px-6 py-4 text-gray-700">
+                  {EXAM_TYPE_BY_SOURCE[sheet.source] ?? sheet.source}
+                </td>
                 <td className="px-6 py-4 font-bold text-gray-800">{sheet.title}</td>
                 <td className="px-6 py-4 text-right">
-                  {sheet.filled ? (
-                    <span className="text-gray-600">입력 완료</span>
-                  ) : (
-                    <Link to="/answer-sheets/input" className="font-bold text-primary-400">
-                      답안 입력 ›
-                    </Link>
-                  )}
+                  <Link to="/answer-sheets/input" className="font-bold text-primary-400">
+                    답안 입력 ›
+                  </Link>
                 </td>
               </tr>
             ))}
