@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 
 import { EXAM_TYPE_BY_SOURCE } from '@/desk/api'
+import { hasAnswerKey } from '@/desk/answers'
 import { useAsync } from '@/hooks/useAsync'
 import { getWorksheets } from '@/services/api'
 
@@ -42,8 +43,15 @@ function AnswerSheetPage() {
                 </td>
                 <td className="px-6 py-4 font-bold text-gray-800">{sheet.title}</td>
                 <td className="px-6 py-4 text-right">
-                  <Link to="/answer-sheets/input" className="font-bold text-primary-400">
-                    답안 입력 ›
+                  <Link
+                    to={`/answer-sheets/input?title=${encodeURIComponent(sheet.title)}`}
+                    className={
+                      hasAnswerKey(sheet.title)
+                        ? 'font-medium text-gray-600'
+                        : 'font-bold text-primary-400'
+                    }
+                  >
+                    {hasAnswerKey(sheet.title) ? '입력 완료' : '답안 입력 ›'}
                   </Link>
                 </td>
               </tr>
