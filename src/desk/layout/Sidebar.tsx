@@ -22,7 +22,7 @@ function Sidebar() {
             className={({ isActive }) =>
               `rounded-xl px-4 py-2.5 text-sm ${
                 isActive
-                  ? 'bg-[#EDFFFD] font-bold text-primary-400'
+                  ? 'bg-primary-50 font-bold text-primary-400'
                   : 'font-medium text-gray-700 hover:bg-gray-100'
               }`
             }
