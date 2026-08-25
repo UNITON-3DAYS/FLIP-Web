@@ -1,7 +1,13 @@
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 
+import ScoreDonut from '@/components/ScoreDonut'
 import { useAsync } from '@/hooks/useAsync'
 import { getGrading } from '@/services/api'
+
+const formatKoreanDate = (date: string) => {
+  const [year, month, day] = date.split('-')
+  return `${year}년 ${Number(month)}월 ${Number(day)}일`
+}
 
 export default function ResultDetailScreen() {
   const navigate = useNavigate()
@@ -32,50 +38,49 @@ export default function ResultDetailScreen() {
 
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-white px-6 pt-12 pb-8">
-      <div className="relative flex items-center justify-center">
-        <button
-          type="button"
-          onClick={() => (fromGrading ? navigate('/results', { replace: true }) : navigate(-1))}
-          className="absolute left-0 text-xl text-gray-700"
-          aria-label="뒤로"
-        >
-          &lt;
-        </button>
-        <h1 className="text-lg font-bold">채점 결과</h1>
+      <button
+        type="button"
+        onClick={() => (fromGrading ? navigate('/results', { replace: true }) : navigate(-1))}
+        className="self-start text-xl text-gray-800"
+        aria-label="뒤로"
+      >
+        &lt;
+      </button>
+
+      <p className="mt-8 text-lg text-gray-600">{formatKoreanDate(record.date)}</p>
+      <h1 className="mt-1 text-2xl font-bold text-gray-900">{record.title}</h1>
+
+      <div className="mt-6">
+        <ScoreDonut
+          score={record.score}
+          correctCount={record.correctCount}
+          totalCount={record.totalCount}
+        />
       </div>
 
-      <div className="mt-6 rounded-[10px] border border-gray-200 bg-white p-5 shadow-sm">
-        <p className="text-lg font-bold">{record.title}</p>
-        <p className="mt-1 text-xs text-gray-600">
-          {record.examType}
-          {record.bookName ? ` · ${record.bookName}` : ''} · {record.range} ·{' '}
-          {record.date.replaceAll('-', '.')}
-        </p>
-        <div className="mt-4 flex items-end gap-3">
-          <span className="text-5xl font-black text-primary-300">{record.score}점</span>
-          <span className="pb-1 text-lg font-bold text-gray-700">
-            {record.correctCount}/{record.totalCount}
-          </span>
-        </div>
-      </div>
-
-      <h2 className="mt-8 text-sm font-bold text-gray-800">오답</h2>
+      <h2 className="mt-8 text-lg font-bold text-gray-900">
+        오답 <span className="text-secondary">{record.wrongAnswers.length}</span>
+      </h2>
       {record.wrongAnswers.length === 0 ? (
         <p className="mt-4 text-sm text-gray-600">오답이 없어요. 완벽해요!</p>
       ) : (
-        <div className="mt-3 overflow-hidden rounded-[10px] border border-gray-200 bg-white shadow-sm">
-          <table className="w-full text-center text-sm">
+        <div className="mt-3 overflow-hidden rounded-xl border border-gray-300 bg-white">
+          <table className="w-full text-center">
             <thead>
-              <tr className="border-b border-gray-300 font-bold text-gray-700">
-                <th className="py-3">페이지</th>
-                <th className="py-3">번호</th>
+              <tr className="border-b border-gray-300 bg-gray-100 text-gray-800">
+                <th className="py-4 font-bold">페이지</th>
+                <th className="py-4 font-bold">문제 번호</th>
               </tr>
             </thead>
             <tbody>
               {record.wrongAnswers.map((wrong, index) => (
                 <tr key={index} className="border-b border-gray-300 last:border-0">
-                  <td className="py-3">{wrong.page}p</td>
-                  <td className="py-3 font-bold text-secondary">{wrong.number}</td>
+                  <td className="py-5 font-bold text-gray-800">{wrong.page}p</td>
+                  <td className="py-5">
+                    <span className="inline-flex size-8 items-center justify-center rounded-full bg-[#FFDCE7] font-bold text-secondary">
+                      {wrong.number}
+                    </span>
+                  </td>
                 </tr>
               ))}
             </tbody>
