@@ -1,19 +1,28 @@
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 
-import { findRecord } from '@/services/records'
+import { useAsync } from '@/hooks/useAsync'
+import { getGrading } from '@/services/api'
 
 export default function ResultDetailScreen() {
   const navigate = useNavigate()
   const location = useLocation()
   const { id } = useParams()
-  const record = id ? findRecord(id) : undefined
   // 채점 직후 진입이면 히스토리에 내역 화면이 없으므로 replace로 이동해 핑퐁을 막는다
   const fromGrading = (location.state as { from?: string } | null)?.from === 'grading'
+  const { data: record, loading, error } = useAsync(() => getGrading(id ?? ''), [id])
 
-  if (!record) {
+  if (loading) {
     return (
       <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col items-center justify-center bg-white px-6 text-center">
-        <p className="text-sm text-gray-600">채점 결과를 찾을 수 없어요.</p>
+        <p className="text-sm text-gray-600">불러오는 중...</p>
+      </main>
+    )
+  }
+
+  if (error || !record) {
+    return (
+      <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col items-center justify-center bg-white px-6 text-center">
+        <p className="text-sm text-gray-600">{error ?? '채점 결과를 찾을 수 없어요.'}</p>
         <Link to="/results" className="mt-4 font-bold text-gray-1000">
           채점 내역으로
         </Link>

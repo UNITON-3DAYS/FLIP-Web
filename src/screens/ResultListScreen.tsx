@@ -1,10 +1,11 @@
 import { Link, useNavigate } from 'react-router-dom'
 
-import { loadRecords } from '@/services/records'
+import { useAsync } from '@/hooks/useAsync'
+import { getGradings } from '@/services/api'
 
 export default function ResultListScreen() {
   const navigate = useNavigate()
-  const records = loadRecords() // 최신순 저장이 보장됨
+  const { data: records, loading, error } = useAsync(getGradings, [])
 
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-white px-6 pt-12 pb-8">
@@ -18,7 +19,15 @@ export default function ResultListScreen() {
       </button>
       <h1 className="mt-4 text-2xl font-bold">채점 내역</h1>
 
-      {records.length === 0 ? (
+      {loading ? (
+        <p className="mt-20 text-center text-sm text-gray-600">불러오는 중...</p>
+      ) : error ? (
+        <p className="mt-20 text-center text-sm text-gray-600">
+          내역을 불러오지 못했어요.
+          <br />
+          {error}
+        </p>
+      ) : !records || records.length === 0 ? (
         <p className="mt-20 text-center text-sm text-gray-600">
           아직 채점 내역이 없어요.
           <br />첫 채점을 시작해보세요!

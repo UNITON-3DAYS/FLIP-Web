@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 
-import { gradeAndSave } from '@/services/records'
+import { submitGrading } from '@/services/api'
 import type { GradingSetup } from '@/types'
 
 const INTERVALS = [3, 5, 7]
@@ -20,8 +20,10 @@ export default function CameraScreen() {
   const [intervalSec, setIntervalSec] = useState(5)
   const [running, setRunning] = useState(false)
   const [countdown, setCountdown] = useState(0)
-  const [shots, setShots] = useState<string[]>([])
+  const [shots, setShots] = useState<Blob[]>([])
   const [flash, setFlash] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
 
   // 카메라 스트림 연결/해제
   useEffect(() => {
@@ -49,7 +51,13 @@ export default function CameraScreen() {
     canvas.width = video.videoWidth
     canvas.height = video.videoHeight
     canvas.getContext('2d')?.drawImage(video, 0, 0)
-    setShots((prev) => [...prev, canvas.toDataURL('image/jpeg', 0.92)])
+    canvas.toBlob(
+      (blob) => {
+        if (blob) setShots((prev) => [...prev, blob])
+      },
+      'image/jpeg',
+      0.92,
+    )
 
     // 버저: 비프음 + 진동(Android) + 화면 플래시(iOS 보완)
     const ctx = audioCtxRef.current
@@ -98,10 +106,17 @@ export default function CameraScreen() {
     setRunning(true)
   }
 
-  const finish = () => {
+  const finish = async () => {
     setRunning(false)
-    const record = gradeAndSave(setup, shots.length)
-    navigate(`/results/${record.id}`, { replace: true, state: { from: 'grading' } })
+    setSubmitting(true)
+    setSubmitError(null)
+    try {
+      const record = await submitGrading(setup, shots)
+      navigate(`/results/${record.id}`, { replace: true, state: { from: 'grading' } })
+    } catch (err) {
+      setSubmitting(false)
+      setSubmitError(err instanceof Error ? err.message : '채점 요청에 실패했어요.')
+    }
   }
 
   if (cameraError) {
@@ -158,14 +173,15 @@ export default function CameraScreen() {
           </div>
         )}
 
-        {running ? (
+        {submitError && <p className="text-center text-sm text-red-400">{submitError}</p>}
+        {running || submitting ? (
           <button
             type="button"
-            disabled={shots.length === 0}
-            onClick={finish}
+            disabled={shots.length === 0 || submitting}
+            onClick={() => void finish()}
             className="rounded-xl bg-white py-4 text-base font-bold text-gray-1000 disabled:bg-gray-800 disabled:text-gray-600"
           >
-            촬영 종료 · 채점하기
+            {submitting ? '채점 중...' : '촬영 종료 · 채점하기'}
           </button>
         ) : (
           <button
