@@ -6,7 +6,7 @@ import Logo from '@/components/Logo'
 import { saveUser } from '@/services/records'
 
 const SCHOOLS = ['서울중학교', '한국중학교', '미래고등학교', '기타']
-const GRADES = ['중1', '중2', '중3', '고1', '고2', '고3']
+const GRADES = ['1학년', '2학년', '3학년']
 
 const fieldClass = 'relative flex flex-col gap-1 rounded-xl bg-gray-200 px-5 py-4'
 const labelClass = 'text-xs font-medium text-gray-700'
