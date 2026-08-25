@@ -4,16 +4,17 @@ import type { FormEvent } from 'react'
 import Dropdown from '@/components/Dropdown'
 import ViewChip from '@/components/ViewChip'
 import type { DeskStudentView } from '@/desk/api'
-import { getDeskStudents } from '@/desk/api'
+import { createDeskStudent, deleteDeskStudent, getDeskStudents } from '@/desk/api'
 import { useAsync } from '@/hooks/useAsync'
-import { getSchools } from '@/services/api'
+import { HAS_SERVER, getSchools } from '@/services/api'
 
 const GRADES = ['1학년', '2학년', '3학년'] as const
 
 function StudentRosterPage() {
-  const { data: serverStudents, loading, error } = useAsync(getDeskStudents, [])
+  const [refresh, setRefresh] = useState(0)
+  const { data: serverStudents, loading, error } = useAsync(getDeskStudents, [refresh])
   const { data: schools, loading: schoolsLoading, error: schoolsError } = useAsync(getSchools, [])
-  // 학생 추가·삭제 API는 서버에 없어 화면 상태로만 반영한다 (데모용)
+  // 목 모드(서버 없음)에서는 추가·삭제를 화면 상태로만 반영한다
   const [extra, setExtra] = useState<DeskStudentView[]>([])
   const [removedIds, setRemovedIds] = useState<Set<string>>(new Set())
   const students = [...(serverStudents ?? []), ...extra].filter(
@@ -24,25 +25,52 @@ function StudentRosterPage() {
   const [name, setName] = useState('')
   const [school, setSchool] = useState('')
   const [grade, setGrade] = useState<string>(GRADES[0])
+  const [password, setPassword] = useState('')
+  const [saving, setSaving] = useState(false)
+  const [mutError, setMutError] = useState<string | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<DeskStudentView | null>(null)
 
-  const addStudent = (e: FormEvent) => {
+  const addStudent = async (e: FormEvent) => {
     e.preventDefault()
-    if (!name.trim() || !school) return
-    setExtra([...extra, { id: `s-${Date.now()}`, name: name.trim(), school, grade }])
-    setName('')
-    setSchool('')
-    dialogRef.current?.close()
+    const schoolId = (schools ?? []).find((item) => item.name === school)?.schoolId
+    if (!name.trim() || schoolId == null || password.trim() === '') return
+    setSaving(true)
+    setMutError(null)
+    try {
+      await createDeskStudent({ name: name.trim(), grade, password: password.trim(), schoolId })
+      if (HAS_SERVER) setRefresh((count) => count + 1)
+      else setExtra([...extra, { id: `s-${Date.now()}`, name: name.trim(), school, grade }])
+      setName('')
+      setSchool('')
+      setPassword('')
+      dialogRef.current?.close()
+    } catch (err) {
+      setMutError(err instanceof Error ? err.message : '학생 추가에 실패했어요.')
+    } finally {
+      setSaving(false)
+    }
   }
 
   const askRemove = (student: DeskStudentView) => {
     setDeleteTarget(student)
+    setMutError(null)
     deleteDialogRef.current?.showModal()
   }
 
-  const confirmRemove = () => {
-    if (deleteTarget) setRemovedIds(new Set([...removedIds, deleteTarget.id]))
-    deleteDialogRef.current?.close()
+  const confirmRemove = async () => {
+    if (!deleteTarget) return
+    setSaving(true)
+    setMutError(null)
+    try {
+      await deleteDeskStudent(deleteTarget.id)
+      if (HAS_SERVER) setRefresh((count) => count + 1)
+      else setRemovedIds(new Set([...removedIds, deleteTarget.id]))
+      deleteDialogRef.current?.close()
+    } catch (err) {
+      setMutError(err instanceof Error ? err.message : '학생 삭제에 실패했어요.')
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
@@ -120,7 +148,7 @@ function StudentRosterPage() {
         className="m-auto w-80 rounded-[10px] bg-white p-6 backdrop:bg-black/40"
       >
         <h2 className="text-lg font-bold text-gray-900">학생 추가</h2>
-        <form onSubmit={addStudent} className="mt-4 flex flex-col gap-3">
+        <form onSubmit={(e) => void addStudent(e)} className="mt-4 flex flex-col gap-3">
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -138,6 +166,14 @@ function StudentRosterPage() {
             <p className="text-xs text-gray-600">학교 목록을 불러오지 못했어요. ({schoolsError})</p>
           )}
           <Dropdown value={grade} options={GRADES} onChange={setGrade} />
+          <input
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="비밀번호 (학생 로그인용)"
+            required
+            className="h-10 rounded-[10px] border border-gray-300 px-3 text-sm outline-none placeholder:text-gray-600 focus:border-primary-300"
+          />
+          {mutError && <p className="text-xs text-secondary">{mutError}</p>}
           <div className="mt-2 flex gap-2">
             <button
               type="button"
@@ -148,9 +184,10 @@ function StudentRosterPage() {
             </button>
             <button
               type="submit"
-              className="flex-1 rounded-full bg-primary-300 py-2 text-sm font-bold text-white"
+              disabled={saving}
+              className="flex-1 rounded-full bg-primary-300 py-2 text-sm font-bold text-white disabled:bg-gray-400"
             >
-              추가
+              {saving ? '추가 중...' : '추가'}
             </button>
           </div>
         </form>
@@ -166,6 +203,7 @@ function StudentRosterPage() {
           <br />
           채점 기록도 함께 사라집니다.
         </p>
+        {mutError && <p className="mt-2 text-xs text-secondary">{mutError}</p>}
         <div className="mt-5 flex gap-2">
           <button
             type="button"
@@ -176,10 +214,11 @@ function StudentRosterPage() {
           </button>
           <button
             type="button"
-            onClick={confirmRemove}
-            className="flex-1 rounded-full bg-secondary py-2 text-sm font-bold text-white"
+            onClick={() => void confirmRemove()}
+            disabled={saving}
+            className="flex-1 rounded-full bg-secondary py-2 text-sm font-bold text-white disabled:bg-gray-400"
           >
-            삭제
+            {saving ? '삭제 중...' : '삭제'}
           </button>
         </div>
       </dialog>

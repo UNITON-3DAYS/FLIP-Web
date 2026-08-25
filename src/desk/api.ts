@@ -50,6 +50,30 @@ export async function getDeskStudents(): Promise<DeskStudentView[]> {
   }))
 }
 
+export async function createDeskStudent(input: {
+  name: string
+  grade: string // '1학년' 형태
+  password: string
+  schoolId: number
+}): Promise<void> {
+  if (!HAS_SERVER) return // 목 모드: 호출부가 화면 상태로만 반영
+  await request('/students', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      name: input.name,
+      grade: Number.parseInt(input.grade, 10),
+      password: input.password,
+      schoolId: input.schoolId,
+    }),
+  })
+}
+
+export async function deleteDeskStudent(id: string): Promise<void> {
+  if (!HAS_SERVER) return
+  await request(`/students/${id}`, { method: 'DELETE' })
+}
+
 interface AdminGradingSummary {
   gradingRecordId: number
   createdAt: string
