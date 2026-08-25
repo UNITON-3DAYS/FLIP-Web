@@ -206,7 +206,7 @@ interface GradingDetailResponse {
   correctCount: number
   totalCount: number
   score: number
-  wrongAnswers: { questionNumber: string; studentAnswer: string }[]
+  wrongAnswers: { page: string; questionNumber: string; studentAnswer: string }[]
 }
 
 export async function getGrading(id: string): Promise<GradingRecord> {
@@ -223,6 +223,9 @@ export async function getGrading(id: string): Promise<GradingRecord> {
     score: detail.score,
     correctCount: detail.correctCount,
     totalCount: detail.totalCount,
-    wrongAnswers: detail.wrongAnswers.map((wrong) => ({ number: wrong.questionNumber })),
+    wrongAnswers: detail.wrongAnswers.map((wrong) => ({
+      page: wrong.page,
+      number: wrong.questionNumber,
+    })),
   }
 }

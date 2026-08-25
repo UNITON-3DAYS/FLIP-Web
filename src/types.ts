@@ -27,7 +27,7 @@ export interface Worksheet {
 }
 
 export interface WrongAnswer {
-  page?: number // 실서버 상세 응답에는 페이지 정보가 없음
+  page?: number | string // 서버는 page를 문자열로 준다 (예: "12")
   number: number | string // 서버는 questionNumber를 문자열로 준다 (예: "3")
 }
 
