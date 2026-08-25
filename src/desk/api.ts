@@ -39,13 +39,13 @@ const mockGradings = (): DeskGradingView[] =>
 
 export async function getDeskStudents(): Promise<DeskStudentView[]> {
   if (!HAS_SERVER) return STUDENTS.map((student) => ({ ...student }))
-  const body = await request<{ students: { studentId: number; grade: number; name: string }[] }>(
-    '/students',
-  )
+  const body = await request<{
+    students: { studentId: number; grade: number; name: string; schoolName?: string }[]
+  }>('/students')
   return body.students.map((student) => ({
     id: String(student.studentId),
     name: student.name,
-    school: '',
+    school: student.schoolName ?? '',
     grade: `${student.grade}학년`,
   }))
 }
