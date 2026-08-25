@@ -149,29 +149,26 @@ interface GradingListResponse {
     worksheetTitle: string
     pageStart?: number // 계약(노션) 필드 — BE 반영 대기
     pageEnd?: number
-    createdAt?: string // 현 서버가 대신 주는 필드
+    createdAt: string
   }[]
 }
 
-// 계약(노션): year/month/day 쿼리로 하루치 조회 + pageStart/End 제공.
-// 현 서버는 쿼리 미지원·createdAt만 주므로, BE가 계약에 맞출 때까지 클라이언트 필터로 보완한다.
+// 계약(노션): year/month/day 쿼리로 하루치 조회. 서버가 날짜 필터링을 담당한다.
 export async function getGradings(date: string): Promise<GradingSummary[]> {
   if (!BASE) return loadRecords().filter((record) => record.date === date)
   const [year, month, day] = date.split('-').map(Number)
   const body = await request<GradingListResponse>(
     `/grading-records?year=${year}&month=${month}&day=${day}`,
   )
-  return body.gradingRecords
-    .map((item) => ({
-      id: String(item.gradingRecordId),
-      title: item.worksheetTitle,
-      range:
-        item.pageStart != null && item.pageEnd != null
-          ? `p.${item.pageStart} ~ p.${item.pageEnd}`
-          : undefined,
-      date: item.createdAt ? toIsoDate(item.createdAt) : date,
-    }))
-    .filter((item) => item.date === date)
+  return body.gradingRecords.map((item) => ({
+    id: String(item.gradingRecordId),
+    title: item.worksheetTitle,
+    range:
+      item.pageStart != null && item.pageEnd != null
+        ? `p.${item.pageStart} ~ p.${item.pageEnd}`
+        : undefined,
+    date: toIsoDate(item.createdAt),
+  }))
 }
 
 // createdAt이 ISO("2026-08-24…")든 명세 예시의 한국어("2026년 8월 24일")든 YYYY-MM-DD로 정규화
