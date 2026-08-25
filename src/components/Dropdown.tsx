@@ -35,36 +35,41 @@ export default function Dropdown({ value, options, placeholder, onChange }: Drop
         </svg>
       </button>
       {open && (
-        <>
-          <button
-            type="button"
-            aria-label="닫기"
-            onClick={() => setOpen(false)}
-            className="fixed inset-0 z-10 cursor-default"
-          />
-          {/* in-flow 렌더: 모달(dialog) 안에서 잘리지 않고 컨테이너가 함께 늘어난다 */}
-          <ul className="relative z-20 mt-1 max-h-48 overflow-auto rounded-[10px] border border-gray-200 bg-white py-1 shadow-lg">
-            {options.map((option) => (
-              <li key={option}>
-                <button
-                  type="button"
-                  onClick={() => {
-                    onChange(option)
-                    setOpen(false)
-                  }}
-                  className={`w-full px-3 py-2 text-left text-sm ${
-                    option === value
-                      ? 'bg-primary-50 font-bold text-primary-400'
-                      : 'text-gray-800 hover:bg-gray-100'
-                  }`}
-                >
-                  {option}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </>
+        <button
+          type="button"
+          aria-label="닫기"
+          onClick={() => setOpen(false)}
+          className="fixed inset-0 z-10 cursor-default"
+        />
       )}
+      {/* in-flow + grid-rows 트랜지션: 모달이 잘리지 않고 부드럽게 함께 늘어난다 */}
+      <div
+        className={`grid transition-all duration-200 ease-out ${
+          open ? 'grid-rows-[1fr] opacity-100' : 'pointer-events-none grid-rows-[0fr] opacity-0'
+        }`}
+      >
+        <ul className="relative z-20 mt-1 min-h-0 overflow-hidden rounded-[10px] border border-gray-200 bg-white shadow-lg">
+          {options.map((option) => (
+            <li key={option}>
+              <button
+                type="button"
+                tabIndex={open ? 0 : -1}
+                onClick={() => {
+                  onChange(option)
+                  setOpen(false)
+                }}
+                className={`w-full px-3 py-2 text-left text-sm ${
+                  option === value
+                    ? 'bg-primary-50 font-bold text-primary-400'
+                    : 'text-gray-800 hover:bg-gray-100'
+                }`}
+              >
+                {option}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   )
 }
