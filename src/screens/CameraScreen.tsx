@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 
-import { submitGrading } from '@/services/api'
+import { completeSession, createSession, uploadPage } from '@/services/api'
 import type { GradingSetup } from '@/types'
 
 const INTERVALS = [3, 5, 7]
@@ -15,12 +15,16 @@ export default function CameraScreen() {
   const streamRef = useRef<MediaStream | null>(null)
   const audioCtxRef = useRef<AudioContext | null>(null)
   const wakeLockRef = useRef<WakeLockSentinel | null>(null)
+  const sessionIdRef = useRef<string | null>(null)
+  const seqRef = useRef(0)
+  const uploadsRef = useRef<Promise<void>[]>([])
+  const failedRef = useRef<{ seq: number; image: Blob }[]>([])
 
   const [cameraError, setCameraError] = useState(false)
   const [intervalSec, setIntervalSec] = useState(5)
   const [running, setRunning] = useState(false)
   const [countdown, setCountdown] = useState(0)
-  const [shots, setShots] = useState<Blob[]>([])
+  const [shotCount, setShotCount] = useState(0)
   const [flash, setFlash] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
@@ -43,6 +47,20 @@ export default function CameraScreen() {
     }
   }, [])
 
+  // 촬영한 장은 즉시 업로드한다 (버저 간격 동안 회선이 놀지 않게). 실패분은 종료 시 일괄 재시도.
+  const uploadShot = useCallback((seq: number, image: Blob) => {
+    const task = (async () => {
+      const sessionId = sessionIdRef.current
+      if (!sessionId) return
+      try {
+        await uploadPage(sessionId, seq, image)
+      } catch {
+        failedRef.current.push({ seq, image })
+      }
+    })()
+    uploadsRef.current.push(task)
+  }, [])
+
   const capture = useCallback(() => {
     const video = videoRef.current
     if (!video || video.videoWidth === 0) return
@@ -53,7 +71,10 @@ export default function CameraScreen() {
     canvas.getContext('2d')?.drawImage(video, 0, 0)
     canvas.toBlob(
       (blob) => {
-        if (blob) setShots((prev) => [...prev, blob])
+        if (!blob) return
+        seqRef.current += 1
+        setShotCount(seqRef.current)
+        uploadShot(seqRef.current, blob)
       },
       'image/jpeg',
       0.92,
@@ -75,7 +96,7 @@ export default function CameraScreen() {
     navigator.vibrate?.(200)
     setFlash(true)
     window.setTimeout(() => setFlash(false), 250)
-  }, [])
+  }, [uploadShot])
 
   // 1초마다 카운트다운, 0이 되면 캡처 후 리셋 (intervalSec은 촬영 중 변경 불가)
   useEffect(() => {
@@ -92,7 +113,7 @@ export default function CameraScreen() {
     return () => window.clearInterval(id)
   }, [running, intervalSec, capture])
 
-  const start = () => {
+  const start = async () => {
     // 사용자 제스처 시점에 AudioContext unlock + 화면 꺼짐 방지
     audioCtxRef.current ??= new AudioContext()
     void audioCtxRef.current.resume()
@@ -102,16 +123,36 @@ export default function CameraScreen() {
         wakeLockRef.current = lock
       })
       .catch(() => {})
+    setSubmitError(null)
+    try {
+      // 에러 후 재시작하면 기존 세션을 이어간다
+      sessionIdRef.current ??= await createSession(setup)
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : '채점 세션 생성에 실패했어요.')
+      return
+    }
     setCountdown(intervalSec)
     setRunning(true)
   }
 
   const finish = async () => {
+    const sessionId = sessionIdRef.current
+    if (!sessionId) return
     setRunning(false)
     setSubmitting(true)
     setSubmitError(null)
     try {
-      const record = await submitGrading(setup, shots)
+      await Promise.all(uploadsRef.current)
+      const failed = failedRef.current.splice(0)
+      for (const shot of failed) {
+        try {
+          await uploadPage(sessionId, shot.seq, shot.image)
+        } catch {
+          failedRef.current.push(shot)
+          throw new Error(`${shot.seq}번째 장 업로드에 실패했어요. 다시 시도해주세요.`)
+        }
+      }
+      const record = await completeSession(sessionId)
       navigate(`/results/${record.id}`, { replace: true, state: { from: 'grading' } })
     } catch (err) {
       setSubmitting(false)
@@ -149,7 +190,7 @@ export default function CameraScreen() {
         {running && (
           <div className="absolute top-10 left-1/2 -translate-x-1/2 rounded-full bg-black/60 px-5 py-2 text-center text-white">
             <span className="text-2xl font-black text-white">{countdown}</span>
-            <span className="ml-2 text-sm">초 후 촬영 · {shots.length}장 완료</span>
+            <span className="ml-2 text-sm">초 후 촬영 · {shotCount}장 완료</span>
           </div>
         )}
       </div>
@@ -177,7 +218,7 @@ export default function CameraScreen() {
         {running || submitting ? (
           <button
             type="button"
-            disabled={shots.length === 0 || submitting}
+            disabled={shotCount === 0 || submitting}
             onClick={() => void finish()}
             className="rounded-xl bg-white py-4 text-base font-bold text-gray-1000 disabled:bg-gray-800 disabled:text-gray-600"
           >
@@ -186,7 +227,7 @@ export default function CameraScreen() {
         ) : (
           <button
             type="button"
-            onClick={start}
+            onClick={() => void start()}
             className="rounded-xl bg-white py-4 text-base font-bold text-gray-1000"
           >
             촬영 시작
