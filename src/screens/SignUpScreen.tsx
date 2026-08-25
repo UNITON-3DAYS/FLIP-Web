@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
+import iconClear from '@/assets/icon-clear.svg'
 import Logo from '@/components/Logo'
 import { saveUser } from '@/services/records'
 
@@ -18,9 +19,9 @@ function ClearButton({ show, onClear, label }: { show: boolean; onClear: () => v
       type="button"
       onClick={onClear}
       aria-label={label}
-      className="absolute top-1/2 right-4 flex size-5 -translate-y-1/2 items-center justify-center rounded-full bg-gray-500 text-[10px] text-white"
+      className="absolute top-1/2 right-4 -translate-y-1/2"
     >
-      ✕
+      <img src={iconClear} alt="" className="size-5" />
     </button>
   )
 }

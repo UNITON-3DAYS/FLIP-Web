@@ -1,19 +1,11 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
+import iconBack from '@/assets/icon-back.svg'
+import iconCalendar from '@/assets/icon-calendar.svg'
 import Calendar from '@/components/Calendar'
 import { useAsync } from '@/hooks/useAsync'
 import { getGradings } from '@/services/api'
-
-function CalendarIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
-      <rect x="1" y="2.5" width="12" height="10.5" rx="2" stroke="#B0B3BA" strokeWidth="1.4" />
-      <path d="M1 5.5H13" stroke="#B0B3BA" strokeWidth="1.4" />
-      <path d="M4.5 1V3.5M9.5 1V3.5" stroke="#B0B3BA" strokeWidth="1.4" strokeLinecap="round" />
-    </svg>
-  )
-}
 
 export default function ResultListScreen() {
   const navigate = useNavigate()
@@ -34,10 +26,10 @@ export default function ResultListScreen() {
         <button
           type="button"
           onClick={() => navigate('/home')}
-          className="absolute left-0 text-xl text-gray-700"
+          className="absolute left-0"
           aria-label="뒤로"
         >
-          &lt;
+          <img src={iconBack} alt="" className="h-4" />
         </button>
         <h1 className="text-lg font-bold text-gray-800">채점 내역</h1>
       </div>
@@ -50,7 +42,7 @@ export default function ResultListScreen() {
           aria-label="날짜 선택"
           className="inline-flex h-[29px] items-center gap-1.5 rounded-full border border-gray-300 bg-white px-3 text-sm font-medium text-gray-700"
         >
-          <CalendarIcon />
+          <img src={iconCalendar} alt="" className="h-3.5" />
           {endDate.replaceAll('-', '.')}
         </button>
         {pickerOpen && (
