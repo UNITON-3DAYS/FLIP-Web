@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 
 import iconBack from '@/assets/icon-back.svg'
 import iconCalendar from '@/assets/icon-calendar.svg'
@@ -9,8 +9,9 @@ import { getGradings } from '@/services/api'
 
 export default function ResultListScreen() {
   const navigate = useNavigate()
-  // 선택한 날짜의 하루치만 조회 (기본: 오늘). 날짜를 바꾸면 재조회한다.
-  const [date, setDate] = useState(new Date().toLocaleDateString('sv-SE'))
+  // 선택 날짜는 URL 쿼리에 둔다 — 상세를 다녀와도(뒤로가기) 선택이 유지된다. 기본: 오늘
+  const [searchParams, setSearchParams] = useSearchParams()
+  const date = searchParams.get('date') ?? new Date().toLocaleDateString('sv-SE')
   const { data: records, loading, error } = useAsync(() => getGradings(date), [date])
   const [pickerOpen, setPickerOpen] = useState(false)
 
@@ -51,7 +52,7 @@ export default function ResultListScreen() {
               <Calendar
                 value={date}
                 onSelect={(selected) => {
-                  setDate(selected)
+                  setSearchParams({ date: selected }, { replace: true })
                   setPickerOpen(false)
                 }}
               />
