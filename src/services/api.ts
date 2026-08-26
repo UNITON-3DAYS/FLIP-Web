@@ -52,9 +52,16 @@ export interface StudentProfile {
   schoolName: string
 }
 
+// 로그인 직후 프리페치해 캐시 — 홈 진입 시 칩이 즉시 뜬다 (학생 ID 전환 시 무효화)
+let profileCache: { id: string; data: StudentProfile } | null = null
+
 export async function getStudentProfile(): Promise<StudentProfile> {
   if (!BASE) return { name: loadUser()?.name ?? '학생', grade: 3, schoolName: '중학교' }
-  return request<StudentProfile>(`/students/${studentIdHeader()}`)
+  const id = studentIdHeader()
+  if (profileCache?.id === id) return profileCache.data
+  const data = await request<StudentProfile>(`/students/${id}`)
+  profileCache = { id, data }
+  return data
 }
 
 export async function getSchools(): Promise<School[]> {

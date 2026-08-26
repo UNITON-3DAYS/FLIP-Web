@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 
 import iconClear from '@/assets/icon-clear.svg'
 import Logo from '@/components/Logo'
+import { getStudentProfile } from '@/services/api'
 import { saveUser } from '@/services/records'
 
 const fieldClass = 'relative flex flex-col gap-1 rounded-xl bg-gray-200 px-5 py-[18px]'
@@ -27,13 +28,24 @@ export default function SignUpScreen() {
   const navigate = useNavigate()
   const [name, setName] = useState('')
   const [password, setPassword] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   // 로그인 API 전 임시: 비밀번호 자리에 서버 학생 ID(숫자)를 입력받는다
-  const canSubmit = name.trim() !== '' && /^\d+$/.test(password.trim())
+  const canSubmit = name.trim() !== '' && /^\d+$/.test(password.trim()) && !submitting
 
-  const submit = () => {
+  // 프로필 조회(파싱)까지 끝난 뒤 홈으로 — 홈 칩이 즉시 뜨고, 없는 학생이면 여기서 걸러진다
+  const submit = async () => {
+    setSubmitting(true)
+    setError(null)
     saveUser({ name: name.trim(), studentId: password.trim() })
-    navigate('/home', { replace: true })
+    try {
+      await getStudentProfile()
+      navigate('/home', { replace: true })
+    } catch {
+      setError('학생 정보를 찾을 수 없어요. 비밀번호를 확인해주세요.')
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -73,13 +85,14 @@ export default function SignUpScreen() {
         </label>
       </div>
 
+      {error && <p className="mt-6 text-center text-sm text-secondary">{error}</p>}
       <button
         type="button"
         disabled={!canSubmit}
-        onClick={submit}
+        onClick={() => void submit()}
         className="mt-auto h-[60px] rounded-[10px] bg-primary-300 text-xl font-bold text-white disabled:bg-gray-400 disabled:text-gray-600"
       >
-        확인
+        {submitting ? '확인 중...' : '확인'}
       </button>
     </main>
   )

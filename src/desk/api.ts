@@ -167,9 +167,12 @@ export async function getDeskGradingsByStudent(studentName: string): Promise<Des
       .filter((grading) => grading.studentName === studentName)
       .sort(byNewest)
   const summaries = await getDeskGradingSummaries()
-  return Promise.all(
-    summaries.filter((summary) => summary.studentName === studentName).map(attachDetail),
+  const results = await Promise.all(
+    summaries
+      .filter((summary) => summary.studentName === studentName)
+      .map((summary) => attachDetail(summary).catch(() => null)), // 개별 실패는 해당 기록만 제외
   )
+  return results.filter((item): item is DeskGradingView => item !== null)
 }
 
 // 채점 상세 화면용 — 목록 1회 + 해당 기록 상세 1회
