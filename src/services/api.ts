@@ -14,7 +14,7 @@ const BASE = import.meta.env.VITE_API_BASE_URL as string | undefined
 export const HAS_SERVER = Boolean(BASE)
 // ponytail: 학생 로그인 API 전 임시 — 가입 화면에서 입력한 학생 ID 사용, 없으면 env → '1'
 const studentIdHeader = () =>
-  loadUser()?.studentId ?? (import.meta.env.VITE_STUDENT_ID as string | undefined) ?? '1'
+  loadUser()?.studentId ?? (import.meta.env.VITE_STUDENT_ID as string | undefined) ?? '20260010'
 
 export const SOURCE_BY_EXAM_TYPE: Record<ExamType, Worksheet['source']> = {
   시험지: 'INHOUSE',
