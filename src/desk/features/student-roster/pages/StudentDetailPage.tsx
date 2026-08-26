@@ -3,21 +3,19 @@ import { Link, useParams } from 'react-router-dom'
 
 import ScoreTrendChart from '@/components/ScoreTrendChart'
 import ViewChip from '@/components/ViewChip'
-import { getDeskGradings, getDeskStudent } from '@/desk/api'
+import { getDeskGradingsByStudent, getDeskStudent } from '@/desk/api'
 import { useAsync } from '@/hooks/useAsync'
 
 function StudentDetailPage() {
   const { studentId } = useParams()
-  const { data, loading, error } = useAsync(
-    () => Promise.all([getDeskStudent(studentId ?? ''), getDeskGradings()]),
-    [studentId],
-  )
-  const student = data?.[0]
   // 관리자 목록에 studentId가 없어 이름으로 매칭한다 (동명이인 미고려 — BE 필드 추가 시 교체)
-  // 기록 테이블은 최신순 (내림차순)
-  const gradings = (data?.[1] ?? [])
-    .filter((grading) => grading.studentName === student?.name)
-    .sort((a, b) => b.date.localeCompare(a.date) || Number(b.id) - Number(a.id))
+  const { data, loading, error } = useAsync(async () => {
+    const student = await getDeskStudent(studentId ?? '')
+    const gradings = student ? await getDeskGradingsByStudent(student.name) : []
+    return { student, gradings }
+  }, [studentId])
+  const student = data?.student
+  const gradings = data?.gradings ?? []
   // 점수 추이는 시험지 채점만, 시간순 최근 5회 (팀 결정)
   const examGradings = gradings
     .filter((grading) => grading.examType === '시험지')
@@ -136,7 +134,8 @@ function StudentDetailPage() {
               </tr>
             </thead>
             <tbody>
-              {gradings.map((grading) => (
+              {/* 기록 테이블은 최근 10건만 (팀 결정) */}
+              {gradings.slice(0, 10).map((grading) => (
                 <tr key={grading.id} className="border-b border-gray-100 last:border-0">
                   <td className="px-6 py-4 text-gray-700">{grading.date.replaceAll('-', '.')}</td>
                   <td className="px-6 py-4 text-gray-700">{grading.examType}</td>

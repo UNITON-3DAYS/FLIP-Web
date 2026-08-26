@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
 
 import ScoreDonut from '@/components/ScoreDonut'
-import { getDeskGradings } from '@/desk/api'
+import { getDeskGrading } from '@/desk/api'
 import { loadComment, saveComment } from '@/desk/mock'
 import { useAsync } from '@/hooks/useAsync'
 
@@ -12,8 +12,7 @@ function GradingResultPage() {
   const from = (useLocation().state as { from?: string } | null)?.from
   const backTo = from ?? '/grading'
   const backLabel = from ? '학생 정보' : '채점 내역'
-  const { data: gradings, loading, error } = useAsync(getDeskGradings, [])
-  const grading = gradings?.find((item) => item.id === recordId)
+  const { data: grading, loading, error } = useAsync(() => getDeskGrading(recordId ?? ''), [recordId])
   const [comment, setComment] = useState(() => loadComment(recordId ?? ''))
   const [saved, setSaved] = useState(false)
 

@@ -11,7 +11,7 @@ export interface DeskStudentView {
   grade: string
 }
 
-export interface DeskGradingView {
+export interface DeskGradingSummary {
   id: string
   studentName: string
   studentGrade: string
@@ -20,6 +20,9 @@ export interface DeskGradingView {
   title: string
   bookName?: string
   range?: string
+}
+
+export interface DeskGradingView extends DeskGradingSummary {
   score: number
   correctCount: number
   totalCount: number
@@ -121,32 +124,57 @@ interface AdminGradingDetail {
   wrongAnswers: { page: string; questionNumber: string; studentAnswer: string }[]
 }
 
-// ponytail: 관리자 목록 응답에 점수·오답이 없어 상세를 N+1 병렬 조회한다 — 해커톤 데이터 규모 전제, 목록 API에 점수가 실리면 제거
-export async function getDeskGradings(): Promise<DeskGradingView[]> {
-  if (!HAS_SERVER) return mockGradings()
+const toSummary = (item: AdminGradingSummary): DeskGradingSummary => ({
+  id: String(item.gradingRecordId),
+  studentName: item.studentName,
+  studentGrade: `${item.grade}학년`,
+  date: toIsoDate(item.createdAt),
+  examType: EXAM_TYPE_BY_SOURCE[item.worksheetSource] ?? '시험지',
+  title: item.worksheetTitle,
+})
+
+const byNewest = (a: DeskGradingSummary, b: DeskGradingSummary) =>
+  b.date.localeCompare(a.date) || Number(b.id) - Number(a.id)
+
+// 목록 화면용 — 상세(점수·오답) 없이 관리자 목록 1회만 조회한다
+export async function getDeskGradingSummaries(): Promise<DeskGradingSummary[]> {
+  if (!HAS_SERVER) return mockGradings().sort(byNewest)
   const { gradingRecords } = await request<{ gradingRecords: AdminGradingSummary[] }>(
     '/admin/grading-records',
   )
-  const details = await Promise.all(
-    gradingRecords.map((item) =>
-      request<AdminGradingDetail>(`/admin/grading-records/${item.gradingRecordId}`),
-    ),
+  return gradingRecords.map(toSummary).sort(byNewest)
+}
+
+// 관리자 목록에 점수·오답이 없어 상세를 개별 조회한다 — 필요한 기록에만 한정 (BE 목록에 점수 실리면 제거)
+async function attachDetail(summary: DeskGradingSummary): Promise<DeskGradingView> {
+  const detail = await request<AdminGradingDetail>(`/admin/grading-records/${summary.id}`)
+  return {
+    ...summary,
+    score: detail.score,
+    correctCount: detail.correctCount,
+    totalCount: detail.totalCount,
+    wrongAnswers: detail.wrongAnswers.map((wrong) => ({
+      page: wrong.page,
+      number: wrong.questionNumber,
+    })),
+  }
+}
+
+// 학생 상세·리포트용 — 해당 학생 기록만 상세 조회
+export async function getDeskGradingsByStudent(studentName: string): Promise<DeskGradingView[]> {
+  if (!HAS_SERVER)
+    return mockGradings()
+      .filter((grading) => grading.studentName === studentName)
+      .sort(byNewest)
+  const summaries = await getDeskGradingSummaries()
+  return Promise.all(
+    summaries.filter((summary) => summary.studentName === studentName).map(attachDetail),
   )
-  return gradingRecords
-    .map((item, index) => ({
-      id: String(item.gradingRecordId),
-      studentName: item.studentName,
-      studentGrade: `${item.grade}학년`,
-      date: toIsoDate(item.createdAt),
-      examType: EXAM_TYPE_BY_SOURCE[item.worksheetSource] ?? '시험지',
-      title: item.worksheetTitle,
-      score: details[index].score,
-      correctCount: details[index].correctCount,
-      totalCount: details[index].totalCount,
-      wrongAnswers: details[index].wrongAnswers.map((wrong) => ({
-        page: wrong.page,
-        number: wrong.questionNumber,
-      })),
-    }))
-    .sort((a, b) => b.date.localeCompare(a.date) || Number(b.id) - Number(a.id)) // 최신순 보장
+}
+
+// 채점 상세 화면용 — 목록 1회 + 해당 기록 상세 1회
+export async function getDeskGrading(id: string): Promise<DeskGradingView | null> {
+  if (!HAS_SERVER) return mockGradings().find((grading) => grading.id === id) ?? null
+  const summary = (await getDeskGradingSummaries()).find((item) => item.id === id)
+  return summary ? attachDetail(summary) : null
 }

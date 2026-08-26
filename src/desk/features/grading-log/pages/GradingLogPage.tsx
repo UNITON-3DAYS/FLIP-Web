@@ -2,14 +2,14 @@ import { useState } from 'react'
 
 import Calendar from '@/components/Calendar'
 import ViewChip from '@/components/ViewChip'
-import { getDeskGradings } from '@/desk/api'
+import { getDeskGradingSummaries } from '@/desk/api'
 import { useAsync } from '@/hooks/useAsync'
 
 function GradingLogPage() {
   const [query, setQuery] = useState('')
   const [date, setDate] = useState<string | null>(null) // null = 전체 기간
   const [pickerOpen, setPickerOpen] = useState(false)
-  const { data: gradings, loading, error } = useAsync(getDeskGradings, [])
+  const { data: gradings, loading, error } = useAsync(getDeskGradingSummaries, [])
 
   const rows = (gradings ?? []).filter(
     (row) =>
